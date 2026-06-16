@@ -21,7 +21,7 @@ effort belongs there.
 ## 1. How the pieces fit together
 
 ```
-Phase 0  calibration (yours)          phase_0_corrected.py
+Phase 0  calibration (yours)          phase_0.py
    │      priors + macro constraint
    ▼
 Phase 1  analytical core              tam_core.py        ← ground truth
