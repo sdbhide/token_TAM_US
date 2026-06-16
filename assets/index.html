@@ -52,6 +52,19 @@
   .explain .term .sw{display:inline-block;width:9px;height:9px;border-radius:2px;
     margin-right:7px;vertical-align:1px;background:var(--enterprise)}
   .explain .def{font-size:13px;color:var(--mute);line-height:1.45}
+  .assume{display:grid;gap:11px;margin-top:2px}
+  .assume .item{display:grid;grid-template-columns:210px 1fr;gap:14px;align-items:baseline}
+  .assume .item.key{background:rgba(84,214,160,.08);border:1px solid var(--accent);
+    border-radius:8px;padding:12px 14px;align-items:start}
+  .assume .nm{font-size:13px;font-weight:600;color:var(--text)}
+  .assume .item.key .nm{color:var(--accent)}
+  .assume .dx{font-size:13px;color:var(--mute);line-height:1.45}
+  .assume .pill{display:inline-block;font-size:9px;letter-spacing:.07em;text-transform:uppercase;
+    background:var(--accent);color:#06231a;border-radius:4px;padding:1px 6px;margin-left:8px;
+    font-weight:700;vertical-align:2px}
+  .glossary{margin-top:30px;padding-top:18px;border-top:1px solid var(--line)}
+  .glossary h2{font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--mute);margin:0 0 12px;font-weight:600}
   .controls{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:0 0 24px}
   .ctrl label{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
     color:var(--mute);margin-bottom:7px}
@@ -98,6 +111,7 @@
     .wrap{padding:24px 16px 48px}
     h1{font-size:24px}
     .explain .row{grid-template-columns:1fr;gap:3px}
+    .assume .item{grid-template-columns:1fr;gap:4px}
     .statrow{grid-template-columns:1fr}
     .links a{flex:1 1 auto;justify-content:center}
   }
@@ -323,6 +337,65 @@ function App(){
             input is responsible for. Four enterprise parameters carry almost all of it — the
             signal for where better data matters most.</p>
           <Bars rows={sobolRows} colorFn={sobolColor}/>
+        </div>
+
+        <div className="card full">
+          <h2>Modeling assumptions</h2>
+          <p className="note">What the number is — and isn't — conditional on. The first
+            is structural; the rest hold in the baseline and are relaxed in extensions.</p>
+          <div className="assume">
+            <div className="item key">
+              <div className="nm">Token-price equilibrium<span className="pill">key</span></div>
+              <div className="dx">TAM is measured in USD at <i>stable</i> token prices — price × token
+                volume with price held fixed. It estimates the long-run equilibrium market, not
+                today's: falling prices and demand elasticity (Jevons effects) are out of scope.
+                This is why equilibrium TAM (~$50B) sits far above current observed revenue (~$14–22B).</div>
+            </div>
+            <div className="item">
+              <div className="nm">Within-segment i.i.d. spend</div>
+              <div className="dx">Every consumer — and every enterprise — draws its spend independently
+                from the same segment-wide distribution.</div>
+            </div>
+            <div className="item">
+              <div className="nm">Count–spend independence</div>
+              <div className="dx">How many adopt is independent of how much each spends. Holds at full
+                saturation; early-adopter selection bends it at partial penetration.</div>
+            </div>
+            <div className="item">
+              <div className="nm">Cross-segment independence</div>
+              <div className="dx">Consumer and enterprise totals move independently in the baseline — no
+                shared macro shock (added back via a covariance term in extensions).</div>
+            </div>
+            <div className="item">
+              <div className="nm">Lognormal tails</div>
+              <div className="dx">Firm size and spend are lognormal. The real upper tail may be heavier
+                (Pareto), which would widen tail risk — flagged, not yet modeled.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="glossary">
+        <h2>Parameter glossary — μ and σ</h2>
+        <div className="explain">
+          <div className="row">
+            <div className="term">μ (mu) — level</div>
+            <div className="def">The log of the <b>median</b>. It sets where the typical unit sits;
+              raise μ and the whole distribution shifts up — a larger median income, firm size, or
+              AI-spend share.</div>
+          </div>
+          <div className="row">
+            <div className="term">σ (sigma) — spread</div>
+            <div className="def">The log-scale <b>dispersion</b>. It sets how unequal units are; raise σ
+              and the right tail grows heavier — a few units pull far above the median, driving the
+              concentration and tail risk that dominate the total.</div>
+          </div>
+          <div className="row">
+            <div className="term">Subscripts</div>
+            <div className="def"><b>IT</b> = income / firm-size scale (I); <b>AI</b> = AI-spend
+              penetration, the share of that budget spent on tokens (K); <b>ₑ</b> = enterprise.
+              Per-unit spend is X = K · I, so μ and σ add across the two.</div>
+          </div>
         </div>
       </div>
 
