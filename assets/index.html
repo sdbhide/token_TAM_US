@@ -3,23 +3,26 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#f5f7fa" />
+<meta name="color-scheme" content="light" />
 <title>US AI Token Demand — TAM Explorer</title>
 <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
 <style>
   :root{
-    --ink:#10171f;        /* near-black blue-grey */
-    --panel:#161e27;      /* panel bg */
-    --panel-2:#1d2731;
-    --line:#2b3a47;       /* hairlines */
-    --mute:#7d93a6;       /* muted labels */
-    --text:#dfe8ef;       /* body text */
-    --consumer:#4ea1d3;   /* segment blue */
-    --enterprise:#e0913a; /* segment amber */
-    --accent:#54d6a0;     /* convergence green */
-    --warn:#e8615e;       /* heavy-tail red */
-    --grid:#22303c;
+    --ink:#f5f7fa;        /* page background — soft off-white */
+    --panel:#ffffff;      /* card surface */
+    --panel-2:#eef1f5;    /* secondary surface (tracks, segments) */
+    --line:#d4dbe3;       /* hairlines */
+    --mute:#5a6b7b;       /* muted labels */
+    --text:#16212e;       /* body text — dark slate */
+    --consumer:#2f6f9f;   /* segment blue */
+    --enterprise:#b06f23; /* segment amber/ochre */
+    --accent:#0f766e;     /* convergence teal */
+    --warn:#b3372c;       /* heavy-tail red */
+    --grid:#e2e7ee;
+    --on-accent:#ffffff;  /* text on accent fill */
   }
   *{box-sizing:border-box}
   html,body{margin:0;background:var(--ink);color:var(--text);
@@ -52,6 +55,19 @@
   .explain .term .sw{display:inline-block;width:9px;height:9px;border-radius:2px;
     margin-right:7px;vertical-align:1px;background:var(--enterprise)}
   .explain .def{font-size:13px;color:var(--mute);line-height:1.45}
+  .assume{display:grid;gap:11px;margin-top:2px}
+  .assume .item{display:grid;grid-template-columns:210px 1fr;gap:14px;align-items:baseline}
+  .assume .item.key{background:rgba(15,118,110,.06);border:1px solid var(--accent);
+    border-radius:8px;padding:12px 14px;align-items:start}
+  .assume .nm{font-size:13px;font-weight:600;color:var(--text)}
+  .assume .item.key .nm{color:var(--accent)}
+  .assume .dx{font-size:13px;color:var(--mute);line-height:1.45}
+  .assume .pill{display:inline-block;font-size:9px;letter-spacing:.07em;text-transform:uppercase;
+    background:var(--accent);color:var(--on-accent);border-radius:4px;padding:1px 6px;margin-left:8px;
+    font-weight:700;vertical-align:2px}
+  .glossary{margin-top:30px;padding-top:18px;border-top:1px solid var(--line)}
+  .glossary h2{font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--mute);margin:0 0 12px;font-weight:600}
   .controls{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:0 0 24px}
   .ctrl label{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
     color:var(--mute);margin-bottom:7px}
@@ -59,9 +75,10 @@
   .seg button{flex:1;background:transparent;border:0;color:var(--mute);
     padding:9px 6px;font-size:13px;cursor:pointer;font-family:inherit;transition:.12s}
   .seg button:hover{color:var(--text);background:var(--panel-2)}
-  .seg button[aria-pressed="true"]{background:var(--accent);color:#06231a;font-weight:600}
+  .seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);font-weight:600}
   .grid{display:grid;grid-template-columns:1.55fr 1fr;gap:16px}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px;
+    box-shadow:0 1px 2px rgba(16,33,46,.04)}
   .card h2{font-size:12px;letter-spacing:.14em;text-transform:uppercase;
     color:var(--mute);margin:0 0 4px;font-weight:600}
   .card .note{font-size:12.5px;color:var(--mute);margin:0 0 14px;line-height:1.4}
@@ -98,6 +115,7 @@
     .wrap{padding:24px 16px 48px}
     h1{font-size:24px}
     .explain .row{grid-template-columns:1fr;gap:3px}
+    .assume .item{grid-template-columns:1fr;gap:4px}
     .statrow{grid-template-columns:1fr}
     .links a{flex:1 1 auto;justify-content:center}
   }
@@ -125,10 +143,10 @@ function DistChart({hist, stats}){
   return (
     <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label="TAM distribution">
       <rect x={X(band[0])} y={padT} width={Math.max(X(band[1])-X(band[0]),0)} height={H-padT-padB}
-            fill="#ffffff" opacity="0.05"/>
+            fill="#16212e" opacity="0.05"/>
       {hist.map((d,i)=>(
         <rect key={i} x={X(d.x)-bw/2} y={Y(d.y)} width={bw} height={Y(0)-Y(d.y)}
-              fill="var(--enterprise)" opacity="0.55" rx="1"/>
+              fill="var(--enterprise)" opacity="0.72" rx="1"/>
       ))}
       {/* median + mean lines */}
       <line x1={X(stats.median)} x2={X(stats.median)} y1={padT} y2={H-padB}
@@ -172,13 +190,13 @@ function Convergence({skew}){
   let color, label, txt;
   if(skew < 0.25){ color="var(--accent)"; label="Near-Gaussian";
     txt="The market total sits in the Central-Limit regime — mean, variance and confidence intervals are reliable."; }
-  else if(skew < 0.6){ color="#cdbb52"; label="Transitional";
+  else if(skew < 0.6){ color="#b07d2b"; label="Transitional";
     txt="Approaching Gaussian, but the upper tail is still heavy. Confidence intervals come from simulation, not the normal approximation."; }
   else { color="var(--warn)"; label="Heavy-tailed";
     txt="Enterprise concentration keeps the total skewed. A few large accounts dominate; tail risk is real and asymmetric."; }
   return (
     <div className="conv">
-      <div className="dot" style={{background:color,boxShadow:`0 0 14px ${color}`}}/>
+      <div className="dot" style={{background:color}}/>
       <div className="txt"><b style={{color}}>{label}</b> · skew {fmt(skew,2)}<br/>
         <span style={{color:"var(--mute)"}}>{txt}</span></div>
     </div>
@@ -323,6 +341,65 @@ function App(){
             input is responsible for. Four enterprise parameters carry almost all of it — the
             signal for where better data matters most.</p>
           <Bars rows={sobolRows} colorFn={sobolColor}/>
+        </div>
+
+        <div className="card full">
+          <h2>Modeling assumptions</h2>
+          <p className="note">What the number is — and isn't — conditional on. The first
+            is structural; the rest hold in the baseline and are relaxed in extensions.</p>
+          <div className="assume">
+            <div className="item key">
+              <div className="nm">Token-price equilibrium<span className="pill">key</span></div>
+              <div className="dx">TAM is measured in USD at <i>stable</i> token prices — price × token
+                volume with price held fixed. It estimates the long-run equilibrium market, not
+                today's: falling prices and demand elasticity (Jevons effects) are out of scope.
+                This is why equilibrium TAM (~$50B) sits far above current observed revenue (~$14–22B).</div>
+            </div>
+            <div className="item">
+              <div className="nm">Within-segment i.i.d. spend</div>
+              <div className="dx">Every consumer — and every enterprise — draws its spend independently
+                from the same segment-wide distribution.</div>
+            </div>
+            <div className="item">
+              <div className="nm">Count–spend independence</div>
+              <div className="dx">How many adopt is independent of how much each spends. Holds at full
+                saturation; early-adopter selection bends it at partial penetration.</div>
+            </div>
+            <div className="item">
+              <div className="nm">Cross-segment independence</div>
+              <div className="dx">Consumer and enterprise totals move independently in the baseline — no
+                shared macro shock (added back via a covariance term in extensions).</div>
+            </div>
+            <div className="item">
+              <div className="nm">Lognormal tails</div>
+              <div className="dx">Firm size and spend are lognormal. The real upper tail may be heavier
+                (Pareto), which would widen tail risk — flagged, not yet modeled.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="glossary">
+        <h2>Parameter glossary — μ and σ</h2>
+        <div className="explain">
+          <div className="row">
+            <div className="term">μ (mu) — level</div>
+            <div className="def">The log of the <b>median</b>. It sets where the typical unit sits;
+              raise μ and the whole distribution shifts up — a larger median income, firm size, or
+              AI-spend share.</div>
+          </div>
+          <div className="row">
+            <div className="term">σ (sigma) — spread</div>
+            <div className="def">The log-scale <b>dispersion</b>. It sets how unequal units are; raise σ
+              and the right tail grows heavier — a few units pull far above the median, driving the
+              concentration and tail risk that dominate the total.</div>
+          </div>
+          <div className="row">
+            <div className="term">Subscripts</div>
+            <div className="def"><b>IT</b> = income / firm-size scale (I); <b>AI</b> = AI-spend
+              penetration, the share of that budget spent on tokens (K); <b>ₑ</b> = enterprise.
+              Per-unit spend is X = K · I, so μ and σ add across the two.</div>
+          </div>
         </div>
       </div>
 
