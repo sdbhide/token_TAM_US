@@ -30,10 +30,10 @@ RNG_SEED = 20260612
 
 # ---- lever definitions (three levels each) -------------------------------
 LEVELS = {
-    "adoption": {   # enterprise AI propensity, mu_K_e
+    "adoption": {   # enterprise AI propensity, mu_K_e  ([FIX-6] 2026/equilibrium re-anchor)
         "label": "Enterprise AI adoption",
         "param": "mu_K_e",
-        "options": {"Low": -7.4, "Base": -6.74, "High": -5.9},
+        "options": {"Low": -6.3, "Base": -5.85, "High": -5.3},
     },
     "concentration": {   # enterprise concentration, sigma_K_e
         "label": "Spend concentration",
