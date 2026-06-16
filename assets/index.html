@@ -274,7 +274,7 @@ function App(){
         <p className="sub">A bottom-up estimate built on US personal income and enterprise firm-size distributions,
           together simulated to its Central-Limit shape. Sensitivity analysis revealed the three enterprise levers that
           drive ~95% of the uncertainty. Move them and watch the whole market respond.
-          <span className="tag mono">illustrative calibration</span></p>
+          <span className="tag mono">Illustrative calibration using 2026 data</span></p>
       </header>
 
       <div className="controls-head">
@@ -327,7 +327,7 @@ function App(){
             frontier (theory §7).</p>
           <Convergence skew={st.skew}/>
           <h2 style={{marginTop:22}}>Variance by segment</h2>
-          <p className="note">Who drives the <i>uncertainty</i> — not the level.</p>
+          <p className="note">Who drives the <i>uncertainty</i></p>
           <Bars rows={segRows} colorFn={segColor}/>
           <div className="legend">
             <span><i style={{background:"var(--consumer)"}}/>Consumer · ${fmt(scen.segments.consumer.mean,0)}B mean</span>
@@ -336,16 +336,16 @@ function App(){
         </div>
 
         <div className="card full">
-          <h2>What drives the tail — P(TAM &gt; $100B)</h2>
+          <h2>What drives the tail P(TAM &gt; $100B)?</h2>
           <p className="note">Total-order Sobol indices: the share of tail-risk uncertainty each
-            input is responsible for. Four enterprise parameters carry almost all of it — the
-            signal for where better data matters most.</p>
+            input is responsible for. Four enterprise parameters carry almost all of it, that's the
+            signal for which data matters the most.</p>
           <Bars rows={sobolRows} colorFn={sobolColor}/>
         </div>
 
         <div className="card full">
           <h2>Modeling assumptions</h2>
-          <p className="note">What the number is — and isn't — conditional on. The first
+          <p className="note">What the numbers are conditional on. The first two
             is structural; the rest hold in the baseline and are relaxed in extensions.</p>
           <div className="assume">
             <div className="item key">
@@ -353,13 +353,15 @@ function App(){
               <div className="dx">TAM is measured in USD at <i>stable</i> token prices — price × token
                 volume with price held fixed. It estimates the long-run equilibrium market, not
                 today's: falling prices and demand elasticity (Jevons effects) are out of scope.
-                The model is anchored to a 2026/equilibrium window (~$40–60B), consistent with
+                The model is anchored to 2026 data/equilibrium window (~$40–60B), consistent with
                 OpenAI + Anthropic alone run-rating to ~$35–40B of US demand and further providers
                 (Google, Microsoft, AWS) on top.</div>
+              <div className="nm">Digital AI only<span className="pill">key</span></div>
+              <div className="dx">This model only considers Digital AI and not Physical AI such as robotics or software driven drones or vehicles.</div>
             </div>
             <div className="item">
               <div className="nm">Within-segment i.i.d. spend</div>
-              <div className="dx">Every consumer — and every enterprise — draws its spend independently
+              <div className="dx">Every consumer and every enterprise draws its spend independently
                 from the same segment-wide distribution.</div>
             </div>
             <div className="item">
@@ -369,31 +371,31 @@ function App(){
             </div>
             <div className="item">
               <div className="nm">Cross-segment independence</div>
-              <div className="dx">Consumer and enterprise totals move independently in the baseline — no
+              <div className="dx">Consumer and enterprise totals move independently in the baseline, i.e. no
                 shared macro shock (added back via a covariance term in extensions).</div>
             </div>
             <div className="item">
               <div className="nm">Lognormal tails</div>
-              <div className="dx">Firm size and spend are lognormal. The real upper tail may be heavier
-                (Pareto), which would widen tail risk — flagged, not yet modeled.</div>
+              <div className="dx">Firm size and spend are lognormal. The real upper tail could be heavier
+                (Pareto), which would widen tail risk.</div>
             </div>
           </div>
         </div>
       </div>
 
       <div className="glossary">
-        <h2>Parameter glossary — μ and σ</h2>
+        <h2>Parameter glossary: μ and σ</h2>
         <div className="explain">
           <div className="row">
-            <div className="term">μ (mu) — level</div>
+            <div className="term">μ (mu) level</div>
             <div className="def">The log of the <b>median</b>. It sets where the typical unit sits;
-              raise μ and the whole distribution shifts up — a larger median income, firm size, or
+              raise μ and the whole distribution shifts up, meaning a larger median income, firm size, or
               AI-spend share.</div>
           </div>
           <div className="row">
-            <div className="term">σ (sigma) — spread</div>
+            <div className="term">σ (sigma) spread</div>
             <div className="def">The log-scale <b>dispersion</b>. It sets how unequal units are; raise σ
-              and the right tail grows heavier — a few units pull far above the median, driving the
+              and the right tail grows heavier, i.e. a few units pull far above the median, driving the
               concentration and tail risk that dominate the total.</div>
           </div>
           <div className="row">
