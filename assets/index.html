@@ -35,7 +35,24 @@
   h1{font-size:30px;line-height:1.1;margin:0;font-weight:650;letter-spacing:-.01em}
   h1 .em{color:var(--accent)}
   .sub{color:var(--mute);max-width:64ch;margin:12px 0 0;font-size:14.5px;line-height:1.5}
-  .controls{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:24px 0}
+  .controls-head{display:flex;align-items:center;justify-content:space-between;
+    gap:12px;margin:24px 0 12px;flex-wrap:wrap}
+  .controls-head .ttl{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
+  .help-btn{background:var(--panel);border:1px solid var(--line);color:var(--text);
+    border-radius:7px;padding:8px 14px;font-size:12.5px;cursor:pointer;font-family:inherit;
+    transition:.12s;display:inline-flex;align-items:center;gap:7px}
+  .help-btn:hover{border-color:var(--accent);color:var(--accent)}
+  .help-btn .ic{display:inline-flex;width:16px;height:16px;border-radius:50%;
+    border:1px solid currentColor;align-items:center;justify-content:center;
+    font-size:11px;font-weight:700;flex:none}
+  .explain{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;
+    padding:14px 16px;margin:0 0 18px;display:grid;gap:10px}
+  .explain .row{display:grid;grid-template-columns:170px 1fr;gap:14px;align-items:baseline}
+  .explain .term{font-size:13px;font-weight:600;color:var(--text)}
+  .explain .term .sw{display:inline-block;width:9px;height:9px;border-radius:2px;
+    margin-right:7px;vertical-align:1px;background:var(--enterprise)}
+  .explain .def{font-size:13px;color:var(--mute);line-height:1.45}
+  .controls{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:0 0 24px}
   .ctrl label{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
     color:var(--mute);margin-bottom:7px}
   .seg{display:flex;border:1px solid var(--line);border-radius:7px;overflow:hidden;background:var(--panel)}
@@ -69,8 +86,21 @@
   .tag{display:inline-block;font-size:11px;border:1px solid var(--line);border-radius:5px;
     padding:2px 8px;color:var(--mute);margin-left:8px;vertical-align:2px}
   .err{padding:40px;text-align:center;color:var(--mute)}
+  .links{display:flex;gap:14px;flex-wrap:wrap;margin-top:14px}
+  .links a{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--accent);
+    text-decoration:none;border:1px solid var(--line);border-radius:7px;padding:7px 12px;
+    transition:.12s}
+  .links a:hover{border-color:var(--accent);background:var(--panel-2)}
+  .links svg{flex:none}
   @media(max-width:860px){.grid{grid-template-columns:1fr}.controls{grid-template-columns:1fr}
     .statrow{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:560px){
+    .wrap{padding:24px 16px 48px}
+    h1{font-size:24px}
+    .explain .row{grid-template-columns:1fr;gap:3px}
+    .statrow{grid-template-columns:1fr}
+    .links a{flex:1 1 auto;justify-content:center}
+  }
 </style>
 </head>
 <body>
@@ -155,10 +185,21 @@ function Convergence({skew}){
   );
 }
 
+// ---- plain-language gloss for the three enterprise levers ---------------
+const LEVER_HELP = [
+  {term:"Enterprise AI adoption",
+   def:"How much of a typical enterprise's IT budget flows to AI tokens — turn it up and more firms are spending more on AI."},
+  {term:"Spend concentration",
+   def:"How unevenly that AI spend is spread across firms — high means a handful of large accounts drive most of the total (a heavy tail)."},
+  {term:"Enterprise scale",
+   def:"The size of the average enterprise's IT budget — the spending base that AI adoption is applied to."},
+];
+
 function App(){
   const [data,setData]=useState(null);
   const [err,setErr]=useState(false);
   const [sel,setSel]=useState(null);
+  const [showHelp,setShowHelp]=useState(false);
 
   useEffect(()=>{
     fetch("dashboard_data.json").then(r=>r.json()).then(d=>{
@@ -218,6 +259,26 @@ function App(){
           <span className="tag mono">illustrative calibration</span></p>
       </header>
 
+      <div className="controls-head">
+        <span className="ttl">Three enterprise levers</span>
+        <button className="help-btn" aria-expanded={showHelp}
+          onClick={()=>setShowHelp(v=>!v)}>
+          <span className="ic">?</span>
+          {showHelp? "Hide explanations" : "What do these mean?"}
+        </button>
+      </div>
+
+      {showHelp && (
+        <div className="explain">
+          {LEVER_HELP.map((h,i)=>(
+            <div className="row" key={i}>
+              <div className="term"><span className="sw"/>{h.term}</div>
+              <div className="def">{h.def}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="controls">
         <Picker dim="adoption"/>
         <Picker dim="concentration"/>
@@ -270,6 +331,26 @@ function App(){
         skewness), Saltelli/Jansen Sobol attribution. Figures are illustrative output from
         placeholder calibrations; shapes and relationships are the durable findings.
         Scenarios vary the three dominant enterprise levers; consumer inputs held at central values.
+        <div className="links">
+          <a href="https://github.com/your-org/token_TAM_US" target="_blank" rel="noopener noreferrer">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+              <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38
+                0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01
+                1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95
+                0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18
+                1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82
+                1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01
+                2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+            </svg>
+            GitHub
+          </a>
+          <a href="https://your-handle.substack.com" target="_blank" rel="noopener noreferrer">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+              <path d="M2 2h12v1.8H2V2zm0 3.6h12V16l-6-3.4L2 16V5.6z"/>
+            </svg>
+            Substack
+          </a>
+        </div>
       </footer>
     </div>
   );
