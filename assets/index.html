@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>US AI Token Demand — TAM Explorer</title>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+<style>
+  :root{
+    --ink:#10171f;        /* near-black blue-grey */
+    --panel:#161e27;      /* panel bg */
+    --panel-2:#1d2731;
+    --line:#2b3a47;       /* hairlines */
+    --mute:#7d93a6;       /* muted labels */
+    --text:#dfe8ef;       /* body text */
+    --consumer:#4ea1d3;   /* segment blue */
+    --enterprise:#e0913a; /* segment amber */
+    --accent:#54d6a0;     /* convergence green */
+    --warn:#e8615e;       /* heavy-tail red */
+    --grid:#22303c;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--ink);color:var(--text);
+    font-family:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .mono{font-family:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+    font-variant-numeric:tabular-nums}
+  a{color:var(--accent)}
+  .wrap{max-width:1180px;margin:0 auto;padding:32px 22px 64px}
+  header{border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:24px}
+  .eyebrow{font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--mute);margin:0 0 8px}
+  h1{font-size:30px;line-height:1.1;margin:0;font-weight:650;letter-spacing:-.01em}
+  h1 .em{color:var(--accent)}
+  .sub{color:var(--mute);max-width:64ch;margin:12px 0 0;font-size:14.5px;line-height:1.5}
+  .controls{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:24px 0}
+  .ctrl label{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--mute);margin-bottom:7px}
+  .seg{display:flex;border:1px solid var(--line);border-radius:7px;overflow:hidden;background:var(--panel)}
+  .seg button{flex:1;background:transparent;border:0;color:var(--mute);
+    padding:9px 6px;font-size:13px;cursor:pointer;font-family:inherit;transition:.12s}
+  .seg button:hover{color:var(--text);background:var(--panel-2)}
+  .seg button[aria-pressed="true"]{background:var(--accent);color:#06231a;font-weight:600}
+  .grid{display:grid;grid-template-columns:1.55fr 1fr;gap:16px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px}
+  .card h2{font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--mute);margin:0 0 4px;font-weight:600}
+  .card .note{font-size:12.5px;color:var(--mute);margin:0 0 14px;line-height:1.4}
+  .statrow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:6px}
+  .stat .k{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--mute)}
+  .stat .v{font-size:23px;font-weight:600;margin-top:3px}
+  .stat .v small{font-size:13px;color:var(--mute);font-weight:400}
+  .full{grid-column:1/-1}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;font-size:12.5px;color:var(--mute);margin-top:10px}
+  .legend i{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:6px;
+    vertical-align:-1px}
+  .bar-row{display:flex;align-items:center;gap:10px;margin:9px 0}
+  .bar-row .lab{width:78px;font-size:12.5px;color:var(--text);text-align:right;flex:none}
+  .bar-track{flex:1;background:var(--panel-2);border-radius:4px;height:18px;position:relative;overflow:hidden}
+  .bar-fill{height:100%;border-radius:4px;transition:width .45s cubic-bezier(.4,0,.2,1)}
+  .bar-row .pct{width:46px;font-size:12.5px;color:var(--mute);flex:none}
+  .conv{display:flex;align-items:center;gap:14px;margin-top:8px}
+  .dot{width:11px;height:11px;border-radius:50%;flex:none}
+  .conv .txt{font-size:13px;line-height:1.45}
+  footer{margin-top:30px;padding-top:18px;border-top:1px solid var(--line);
+    color:var(--mute);font-size:12.5px;line-height:1.6}
+  .tag{display:inline-block;font-size:11px;border:1px solid var(--line);border-radius:5px;
+    padding:2px 8px;color:var(--mute);margin-left:8px;vertical-align:2px}
+  .err{padding:40px;text-align:center;color:var(--mute)}
+  @media(max-width:860px){.grid{grid-template-columns:1fr}.controls{grid-template-columns:1fr}
+    .statrow{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState, useEffect, useMemo} = React;
+const fmt = (v,d=1)=> v==null? "—" : v.toLocaleString(undefined,{minimumFractionDigits:d,maximumFractionDigits:d});
+
+// ---- TAM distribution chart (log x, mean/median/P5-P95) -----------------
+function DistChart({hist, stats}){
+  const W=640,H=300,padL=20,padR=16,padT=22,padB=34;
+  if(!hist||!hist.length) return null;
+  const xs=hist.map(d=>d.x), ys=hist.map(d=>d.y);
+  const lx=xs.map(Math.log10);
+  const xmin=Math.min(...lx), xmax=Math.max(...lx);
+  const ymax=Math.max(...ys);
+  const X=v=>padL+( (Math.log10(v)-xmin)/(xmax-xmin) )*(W-padL-padR);
+  const Y=v=>padT+(1-v/ymax)*(H-padT-padB);
+  const bw=(W-padL-padR)/hist.length*0.86;
+  const ticks=[10,20,50,100,200,500].filter(t=>Math.log10(t)>=xmin+0.02 && Math.log10(t)<=xmax-0.02);
+  const band=[stats.p5,stats.p95];
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label="TAM distribution">
+      <rect x={X(band[0])} y={padT} width={Math.max(X(band[1])-X(band[0]),0)} height={H-padT-padB}
+            fill="#ffffff" opacity="0.05"/>
+      {hist.map((d,i)=>(
+        <rect key={i} x={X(d.x)-bw/2} y={Y(d.y)} width={bw} height={Y(0)-Y(d.y)}
+              fill="var(--enterprise)" opacity="0.55" rx="1"/>
+      ))}
+      {/* median + mean lines */}
+      <line x1={X(stats.median)} x2={X(stats.median)} y1={padT} y2={H-padB}
+            stroke="var(--text)" strokeWidth="1.6"/>
+      <line x1={X(stats.mean)} x2={X(stats.mean)} y1={padT} y2={H-padB}
+            stroke="var(--warn)" strokeWidth="1.6" strokeDasharray="5 3"/>
+      <text x={X(stats.median)} y={padT-1} fill="var(--text)" fontSize="10.5"
+            textAnchor="middle" className="mono">med ${fmt(stats.median,0)}B</text>
+      <text x={X(stats.mean)} y={padT+13} fill="var(--warn)" fontSize="10.5"
+            textAnchor="middle" className="mono">mean ${fmt(stats.mean,0)}B</text>
+      {ticks.map(t=>(
+        <g key={t}>
+          <line x1={X(t)} x2={X(t)} y1={H-padB} y2={H-padB+4} stroke="var(--mute)"/>
+          <text x={X(t)} y={H-padB+17} fill="var(--mute)" fontSize="11" textAnchor="middle"
+                className="mono">${t}B</text>
+        </g>
+      ))}
+      <text x={W/2} y={H-3} fill="var(--mute)" fontSize="11" textAnchor="middle">
+        annual US AI token demand ($B, log scale)</text>
+    </svg>
+  );
+}
+
+// ---- horizontal share bars (segments / sobol) --------------------------
+function Bars({rows, colorFn}){
+  const max=Math.max(...rows.map(r=>r.value),1e-9);
+  return rows.map((r,i)=>(
+    <div className="bar-row" key={i}>
+      <div className="lab">{r.label}</div>
+      <div className="bar-track">
+        <div className="bar-fill" style={{width:`${r.value/max*100}%`,background:colorFn(r,i)}}/>
+      </div>
+      <div className="pct mono">{(r.value*100).toFixed(0)}%</div>
+    </div>
+  ));
+}
+
+// ---- convergence indicator (signature element) -------------------------
+function Convergence({skew}){
+  // map skew to a regime; thresholds align with theory §7 (gamma ~ 0.5 frontier)
+  let color, label, txt;
+  if(skew < 0.25){ color="var(--accent)"; label="Near-Gaussian";
+    txt="The market total sits in the Central-Limit regime — mean, variance and confidence intervals are reliable."; }
+  else if(skew < 0.6){ color="#cdbb52"; label="Transitional";
+    txt="Approaching Gaussian, but the upper tail is still heavy. Confidence intervals come from simulation, not the normal approximation."; }
+  else { color="var(--warn)"; label="Heavy-tailed";
+    txt="Enterprise concentration keeps the total skewed. A few large accounts dominate; tail risk is real and asymmetric."; }
+  return (
+    <div className="conv">
+      <div className="dot" style={{background:color,boxShadow:`0 0 14px ${color}`}}/>
+      <div className="txt"><b style={{color}}>{label}</b> · skew {fmt(skew,2)}<br/>
+        <span style={{color:"var(--mute)"}}>{txt}</span></div>
+    </div>
+  );
+}
+
+function App(){
+  const [data,setData]=useState(null);
+  const [err,setErr]=useState(false);
+  const [sel,setSel]=useState(null);
+
+  useEffect(()=>{
+    fetch("dashboard_data.json").then(r=>r.json()).then(d=>{
+      setData(d);
+      const a=Object.keys(d.levels.adoption.options);
+      const c=Object.keys(d.levels.concentration.options);
+      const s=Object.keys(d.levels.scale.options);
+      setSel({adoption:a[Math.floor(a.length/2)],
+              concentration:c[Math.floor(c.length/2)],
+              scale:s[Math.floor(s.length/2)]});
+    }).catch(()=>setErr(true));
+  },[]);
+
+  const scen = useMemo(()=>{
+    if(!data||!sel) return null;
+    return data.scenarios[`${sel.adoption}|${sel.concentration}|${sel.scale}`];
+  },[data,sel]);
+
+  if(err) return <div className="wrap"><div className="err">Couldn't load
+    <span className="mono"> dashboard_data.json</span>. Make sure it sits beside this file.</div></div>;
+  if(!data||!sel||!scen) return <div className="wrap"><div className="err">Loading model output…</div></div>;
+
+  const Picker = ({dim})=>{
+    const opts=Object.keys(data.levels[dim].options);
+    return (
+      <div className="ctrl">
+        <label>{data.levels[dim].label}</label>
+        <div className="seg" role="group">
+          {opts.map(o=>(
+            <button key={o} aria-pressed={sel[dim]===o}
+              onClick={()=>setSel(s=>({...s,[dim]:o}))}>{o}</button>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  const st=scen.stats;
+  const segRows=[
+    {label:"Consumer", value:scen.segments.consumer.varShare},
+    {label:"Enterprise", value:scen.segments.enterprise.varShare},
+  ];
+  const segColor=r=> r.label==="Consumer"?"var(--consumer)":"var(--enterprise)";
+  const sobolRows = scen.sobolTail.map(d=>({label:d.name.replace("_e","ₑ").replace("mu_I","μ·IT")
+        .replace("sigma_I","σ·IT").replace("mu_K","μ·AI").replace("sigma_K","σ·AI"),
+        value:d.ST}));
+  const sobolColor=r=> r.label==="all others"?"var(--line)":"var(--enterprise)";
+
+  return (
+    <div className="wrap">
+      <header>
+        <p className="eyebrow">Digital AI demand · United States · equilibrium dollars</p>
+        <h1>How big is the US market for <span className="em">AI tokens</span>?</h1>
+        <p className="sub">A bottom-up estimate built on US income and firm-size distributions,
+          simulated to its Central-Limit shape. Move the three enterprise levers — the inputs that
+          drive ~95% of the uncertainty — and watch the whole market respond.
+          <span className="tag mono">illustrative calibration</span></p>
+      </header>
+
+      <div className="controls">
+        <Picker dim="adoption"/>
+        <Picker dim="concentration"/>
+        <Picker dim="scale"/>
+      </div>
+
+      <div className="grid">
+        <div className="card">
+          <h2>Total addressable market</h2>
+          <p className="note">Distribution of annual US digital-AI spend across model runs.
+            The gap between mean and median is the lognormal right-skew.</p>
+          <DistChart hist={scen.hist} stats={st}/>
+          <div className="statrow">
+            <div className="stat"><div className="k">Mean</div>
+              <div className="v mono">${fmt(st.mean,0)}<small>B</small></div></div>
+            <div className="stat"><div className="k">Median</div>
+              <div className="v mono">${fmt(st.median,0)}<small>B</small></div></div>
+            <div className="stat"><div className="k">90% interval</div>
+              <div className="v mono" style={{fontSize:"17px"}}>${fmt(st.p5,0)}–{fmt(st.p95,0)}<small>B</small></div></div>
+            <div className="stat"><div className="k">Skew</div>
+              <div className="v mono">{fmt(st.skew,2)}</div></div>
+          </div>
+        </div>
+
+        <div className="card">
+          <h2>Convergence regime</h2>
+          <p className="note">Where this scenario sits relative to the Gaussian
+            frontier (theory §7).</p>
+          <Convergence skew={st.skew}/>
+          <h2 style={{marginTop:22}}>Variance by segment</h2>
+          <p className="note">Who drives the <i>uncertainty</i> — not the level.</p>
+          <Bars rows={segRows} colorFn={segColor}/>
+          <div className="legend">
+            <span><i style={{background:"var(--consumer)"}}/>Consumer · ${fmt(scen.segments.consumer.mean,0)}B mean</span>
+            <span><i style={{background:"var(--enterprise)"}}/>Enterprise · ${fmt(scen.segments.enterprise.mean,0)}B mean</span>
+          </div>
+        </div>
+
+        <div className="card full">
+          <h2>What drives the tail — P(TAM &gt; $100B)</h2>
+          <p className="note">Total-order Sobol indices: the share of tail-risk uncertainty each
+            input is responsible for. Four enterprise parameters carry almost all of it — the
+            signal for where better data matters most.</p>
+          <Bars rows={sobolRows} colorFn={sobolColor}/>
+        </div>
+      </div>
+
+      <footer>
+        Model: dual-segment compound-lognormal TAM, two-level Monte Carlo (Wald + third-cumulant
+        skewness), Saltelli/Jansen Sobol attribution. Figures are illustrative output from
+        placeholder calibrations; shapes and relationships are the durable findings.
+        Scenarios vary the three dominant enterprise levers; consumer inputs held at central values.
+      </footer>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
