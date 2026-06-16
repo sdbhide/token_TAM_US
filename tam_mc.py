@@ -106,13 +106,13 @@ PHASE0_PRIORS: dict[str, Prior] = {
     "N_i":       Prior(80e6, 150e6, mode=100e6, kind="triangular"),
     "mu_I_i":    Prior(10.50, 10.62, mode=10.6086, kind="triangular"),
     "sigma_I_i": Prior(0.82, 0.93, mode=0.8763, kind="triangular"),
-    "mu_K_i":    Prior(-7.21, -5.31, mode=-6.52, kind="triangular"),
+    "mu_K_i":    Prior(-6.5, -5.5, mode=-6.05, kind="triangular"),    # [FIX-6] 2026/equilibrium re-anchor
     "sigma_K_i": Prior(0.5, 1.0, mode=0.70, kind="triangular"),
     # enterprise
     "N_e":       Prior(5.0e6, 6.3e6, mode=5.0e6, kind="triangular"),
     "mu_I_e":    Prior(11.5, 13.8, mode=12.0, kind="triangular"),
     "sigma_I_e": Prior(1.5, 2.5, mode=1.8, kind="triangular"),
-    "mu_K_e":    Prior(-7.5, -5.5, mode=-6.74, kind="triangular"),
+    "mu_K_e":    Prior(-6.3, -5.3, mode=-5.85, kind="triangular"),    # [FIX-6] 2026/equilibrium re-anchor
     "sigma_K_e": Prior(0.8, 1.5, mode=1.2, kind="triangular"),
 }
 
