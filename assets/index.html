@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="theme-color" content="#f5f7fa" />
 <meta name="color-scheme" content="light" />
-<title>US AI Token Demand — TAM Explorer</title>
+<title>US AI Token Demand: TAM Explorer</title>
 <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
 <style>
   :root{
-    --ink:#f5f7fa;        /* page background — soft off-white */
+    --ink:#f5f7fa;        /* page background, soft off-white */
     --panel:#ffffff;      /* card surface */
     --panel-2:#eef1f5;    /* secondary surface (tracks, segments) */
     --line:#d4dbe3;       /* hairlines */
     --mute:#5a6b7b;       /* muted labels */
-    --text:#16212e;       /* body text — dark slate */
+    --text:#16212e;       /* body text, dark slate */
     --consumer:#2f6f9f;   /* segment blue */
     --enterprise:#b06f23; /* segment amber/ochre */
     --accent:#0f766e;     /* convergence teal */
@@ -125,7 +125,7 @@
 <div id="root"></div>
 <script type="text/babel">
 const {useState, useEffect, useMemo} = React;
-const fmt = (v,d=1)=> v==null? "—" : v.toLocaleString(undefined,{minimumFractionDigits:d,maximumFractionDigits:d});
+const fmt = (v,d=1)=> v==null? "n/a" : v.toLocaleString(undefined,{minimumFractionDigits:d,maximumFractionDigits:d});
 
 // ---- TAM distribution chart (log x, mean/median/P5-P95) -----------------
 function DistChart({hist, stats}){
@@ -189,7 +189,7 @@ function Convergence({skew}){
   // map skew to a regime; thresholds align with theory §7 (gamma ~ 0.5 frontier)
   let color, label, txt;
   if(skew < 0.25){ color="var(--accent)"; label="Near-Gaussian";
-    txt="The market total sits in the Central-Limit regime — mean, variance and confidence intervals are reliable."; }
+    txt="The market total sits in the Central-Limit regime: mean, variance and confidence intervals are reliable."; }
   else if(skew < 0.6){ color="#b07d2b"; label="Transitional";
     txt="Approaching Gaussian, but the upper tail is still heavy. Confidence intervals come from simulation, not the normal approximation."; }
   else { color="var(--warn)"; label="Heavy-tailed";
@@ -327,7 +327,7 @@ function App(){
             frontier (theory §7).</p>
           <Convergence skew={st.skew}/>
           <h2 style={{marginTop:22}}>Variance by segment</h2>
-          <p className="note">Who drives the <i>uncertainty</i> — not the level.</p>
+          <p className="note">Who drives the <i>uncertainty</i>, not the level.</p>
           <Bars rows={segRows} colorFn={segColor}/>
           <div className="legend">
             <span><i style={{background:"var(--consumer)"}}/>Consumer · ${fmt(scen.segments.consumer.mean,0)}B mean</span>
@@ -336,21 +336,21 @@ function App(){
         </div>
 
         <div className="card full">
-          <h2>What drives the tail — P(TAM &gt; $100B)</h2>
+          <h2>What drives the tail: P(TAM &gt; $100B)</h2>
           <p className="note">Total-order Sobol indices: the share of tail-risk uncertainty each
-            input is responsible for. Four enterprise parameters carry almost all of it — the
+            input is responsible for. Four enterprise parameters carry almost all of it; the
             signal for where better data matters most.</p>
           <Bars rows={sobolRows} colorFn={sobolColor}/>
         </div>
 
         <div className="card full">
           <h2>Modeling assumptions</h2>
-          <p className="note">What the number is — and isn't — conditional on. The first
+          <p className="note">What the number is, and isn't, conditional on. The first
             is structural; the rest hold in the baseline and are relaxed in extensions.</p>
           <div className="assume">
             <div className="item key">
               <div className="nm">Token-price equilibrium<span className="pill">key</span></div>
-              <div className="dx">TAM is measured in USD at <i>stable</i> token prices — price × token
+              <div className="dx">TAM is measured in USD at <i>stable</i> token prices: price × token
                 volume with price held fixed. It estimates the long-run equilibrium market, not
                 today's: falling prices and demand elasticity (Jevons effects) are out of scope.
                 The model is anchored to a 2026/equilibrium window (~$40–60B), consistent with
@@ -359,7 +359,7 @@ function App(){
             </div>
             <div className="item">
               <div className="nm">Within-segment i.i.d. spend</div>
-              <div className="dx">Every consumer — and every enterprise — draws its spend independently
+              <div className="dx">Every consumer, and every enterprise, draws its spend independently
                 from the same segment-wide distribution.</div>
             </div>
             <div className="item">
@@ -369,31 +369,31 @@ function App(){
             </div>
             <div className="item">
               <div className="nm">Cross-segment independence</div>
-              <div className="dx">Consumer and enterprise totals move independently in the baseline — no
+              <div className="dx">Consumer and enterprise totals move independently in the baseline, with no
                 shared macro shock (added back via a covariance term in extensions).</div>
             </div>
             <div className="item">
               <div className="nm">Lognormal tails</div>
               <div className="dx">Firm size and spend are lognormal. The real upper tail may be heavier
-                (Pareto), which would widen tail risk — flagged, not yet modeled.</div>
+                (Pareto), which would widen tail risk; flagged, not yet modeled.</div>
             </div>
           </div>
         </div>
       </div>
 
       <div className="glossary">
-        <h2>Parameter glossary — μ and σ</h2>
+        <h2>Parameter glossary: μ and σ</h2>
         <div className="explain">
           <div className="row">
-            <div className="term">μ (mu) — level</div>
+            <div className="term">μ (mu): level</div>
             <div className="def">The log of the <b>median</b>. It sets where the typical unit sits;
-              raise μ and the whole distribution shifts up — a larger median income, firm size, or
+              raise μ and the whole distribution shifts up: a larger median income, firm size, or
               AI-spend share.</div>
           </div>
           <div className="row">
-            <div className="term">σ (sigma) — spread</div>
+            <div className="term">σ (sigma): spread</div>
             <div className="def">The log-scale <b>dispersion</b>. It sets how unequal units are; raise σ
-              and the right tail grows heavier — a few units pull far above the median, driving the
+              and the right tail grows heavier: a few units pull far above the median, driving the
               concentration and tail risk that dominate the total.</div>
           </div>
           <div className="row">

@@ -37,7 +37,7 @@ def zscore(sim_value, true_value, se):
 # 1. ACCEPTANCE: fixed central Phase 0 params, simulator vs closed forms
 # ---------------------------------------------------------------------------
 def test_acceptance_vs_closed_forms():
-    print("\n[1] ACCEPTANCE — simulator vs Phase 1 closed forms (fixed params)")
+    print("\n[1] ACCEPTANCE - simulator vs Phase 1 closed forms (fixed params)")
     draw = mc.central_model_draw()
     reps = 40_000
     rng = np.random.default_rng(RNG_SEED)
@@ -68,7 +68,7 @@ def test_acceptance_vs_closed_forms():
 
         # skewness: sample skew has SE ~ sqrt(6/reps) under near-normality.
         # When true skew is below that noise floor (consumer segment at N=1e8,
-        # gamma ~ 1e-3), a relative test is meaningless — use an absolute band.
+        # gamma ~ 1e-3), a relative test is meaningless - use an absolute band.
         g_sim = np.mean(x**3) / s2**1.5
 
         check(f"{label}: mean   |z|={abs(z_m):.2f}", abs(z_m) < 3,

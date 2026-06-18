@@ -30,7 +30,7 @@ def main():
     rows = ts.tornado()
     y0 = rows[0]["y_central"]
     print("=" * 68)
-    print(f"TORNADO — E[TAM] (central = ${y0/B:.1f}B), swing = |high - low|")
+    print(f"TORNADO - E[TAM] (central = ${y0/B:.1f}B), swing = |high - low|")
     print("=" * 68)
     for r in rows:
         print(f"  {r['param']:<10} low=${r['y_low']/B:7.1f}B  "
@@ -49,13 +49,13 @@ def main():
     ax.axvline(yc, color="k", lw=1)
     ax.set_yticks(ypos, names)
     ax.set_xlabel("E[TAM] ($B/yr)")
-    ax.set_title("Tornado — one-at-a-time over Phase 0 prior ranges")
+    ax.set_title("Tornado - one-at-a-time over Phase 0 prior ranges")
     ax.legend(); ax.grid(alpha=0.3, axis="x")
     fig.tight_layout(); fig.savefig(OUT_TORNADO, dpi=150)
     print(f"-> {OUT_TORNADO}")
 
     # ===================================================================
-    # 2. SOBOL — level QoI and tail-exceedance QoIs
+    # 2. SOBOL - level QoI and tail-exceedance QoIs
     # ===================================================================
     print("\n" + "=" * 68)
     print("SOBOL INDICES (Saltelli design, n_base=2^14; validated on Ishigami)")
@@ -90,7 +90,7 @@ def main():
         ax.set_title(label)
         ax.grid(alpha=0.3, axis="x")
     axes[0].legend(loc="lower right")
-    fig.suptitle("Sobol attribution — what drives the level vs the tail")
+    fig.suptitle("Sobol attribution - what drives the level vs the tail")
     fig.tight_layout(rect=(0, 0, 1, 0.94))
     fig.savefig(OUT_SOBOL, dpi=150)
     print(f"\n-> {OUT_SOBOL}")
@@ -118,7 +118,7 @@ def main():
         if k == 0:
             ax.set_ylabel(r"$\sigma_{X,e}$ (enterprise concentration)")
         fig.colorbar(pc, ax=ax, label=r"$\log_{10}\gamma_{TAM}$")
-    fig.suptitle(r"Scenario grid — skewness $\gamma_{TAM}$ over "
+    fig.suptitle(r"Scenario grid - skewness $\gamma_{TAM}$ over "
                  r"$(\theta, \sigma_{X,e}, E[N_e])$; contours = "
                  r"$\sigma_{crit}$ frontier (theory §7), consumer segment at "
                  "Phase 0 central")
@@ -161,7 +161,7 @@ def main():
         print(f"  {'P'+format(int(q*100),'02d'):<14}"
               f"${np.quantile(res.tam, q)/B:>14.1f}B ${wq(q)/B:>14.1f}B")
     print("\n  NOTE: conditioning collapses TAM uncertainty onto the observed-")
-    print("  revenue window — appropriate if the model estimates the CURRENT")
+    print("  revenue window - appropriate if the model estimates the CURRENT")
     print("  market. For *equilibrium* TAM, condition only the parameters that")
     print("  should persist (sigma's, N's) and let mu_K grow; that scenario")
     print("  layer belongs to Phase 5 (price/adoption dynamics).")

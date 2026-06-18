@@ -39,7 +39,7 @@ def main():
         tam = np.load("tam_phase2_samples.npz")["tam"]
         print("(a) using saved Phase 2 samples")
     except FileNotFoundError:
-        print("(a) Phase 2 samples not found — simulating")
+        print("(a) Phase 2 samples not found - simulating")
         tam = mc.run_mc(mc.MCConfig(outer_draws=20000, inner_reps=1)).tam
     fig = tv.fig_distribution(tam)
     fig.savefig(FILES["a"], dpi=150)
@@ -79,9 +79,9 @@ def main():
     # Variance layers reflect count uncertainty (theory §4 Beta-Binomial), not
     # just spend dispersion, so the figure shows real per-realization risk.
     # Concentration params are illustrative (not Phase 0): consumer adoption is
-    # tightly estimable, enterprise less so. The qualitative finding — that the
+    # tightly estimable, enterprise less so. The qualitative finding - that the
     # consumer segment's enormous N amplifies even small adoption-rate
-    # uncertainty into a variance layer rivaling enterprise — is robust to these.
+    # uncertainty into a variance layer rivaling enterprise - is robust to these.
     def betabinom_counts(pop, p_mean, conc):
         a, b = p_mean * conc, (1 - p_mean) * conc
         var = pop * p_mean * (1 - p_mean) * (1 + (pop - 1) / (a + b + 1))

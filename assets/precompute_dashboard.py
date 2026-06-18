@@ -2,7 +2,7 @@
 precompute_dashboard.py
 =======================
 Precompute every scenario the dashboard can display, and dump to a single JSON
-the static React app loads. No backend needed — Netlify-friendly.
+the static React app loads. No backend needed - Netlify-friendly.
 
 Scenarios vary the three enterprise levers Phase 3 identified as dominant:
   * enterprise AI propensity  (mu_K_e)   -> "Enterprise AI adoption"  (Low/Base/High)
