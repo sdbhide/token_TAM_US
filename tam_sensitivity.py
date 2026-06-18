@@ -5,16 +5,16 @@ Phase 3: Sensitivity and uncertainty attribution for the dual-segment TAM model.
 
 Components
 ----------
-1. VECTORIZED CLOSED-FORM EVALUATORS — E[TAM | params] and gamma_TAM as pure
+1. VECTORIZED CLOSED-FORM EVALUATORS - E[TAM | params] and gamma_TAM as pure
    numpy functions of an (n, 10) parameter matrix. Because Phase 2 showed
    population noise contributes ~0.04% of variance, the deterministic map
    params -> E[TAM | params] IS the model for attribution purposes; this makes
    Sobol analysis essentially free (no inner simulation needed).
 
-2. TORNADO — one-at-a-time perturbation of each parameter to its prior low/high
+2. TORNADO - one-at-a-time perturbation of each parameter to its prior low/high
    with all others at the Phase 0 central anchors.
 
-3. SOBOL INDICES — first-order (S1, Saltelli 2010 estimator) and total-order
+3. SOBOL INDICES - first-order (S1, Saltelli 2010 estimator) and total-order
    (ST, Jansen 1999 estimator) on a Saltelli design built from scipy's quasi-
    random Sobol sequence, with bootstrap CIs. SALib is not available in this
    environment; the implementation below is validated against the Ishigami
@@ -23,11 +23,11 @@ Components
    QoIs: Y = E[TAM | params]  (drivers of the level)
          Y = 1{E[TAM | params] > x}  (drivers of tail exceedance P(TAM > x))
 
-4. SCENARIO GRID over (theta, sigma_X_e, E[N_e]) — E[TAM] and exact gamma_TAM
+4. SCENARIO GRID over (theta, sigma_X_e, E[N_e]) - E[TAM] and exact gamma_TAM
    on each grid point, with the gamma = epsilon contour (the sigma_crit
    frontier of theory doc §7) overlaid by the Phase 3 driver.
 
-5. MACRO-CONSTRAINT CONDITIONING — importance weights that softly condition the
+5. MACRO-CONSTRAINT CONDITIONING - importance weights that softly condition the
    Phase 0 prior on the observed current-revenue window ($14-22B), yielding a
    constrained posterior over parameters and TAM.
 
@@ -179,7 +179,7 @@ def saltelli_sample(
     """Saltelli design: returns (A, B, AB) with A,B of shape (n, d) and AB of
     shape (d, n, d), where AB[i] equals A with column i replaced by B's.
 
-    Uses scipy's scrambled Sobol sequence in 2d dimensions, split into A | B —
+    Uses scipy's scrambled Sobol sequence in 2d dimensions, split into A | B -
     the standard quasi-random construction. n_base should be a power of 2.
     """
     d = len(PARAM_NAMES)
@@ -284,7 +284,7 @@ def scenario_grid(
     (theory doc §6.2). Given (theta, sigma_X_e), the enterprise location is
         mu_X_e = ln(theta * E[X_i]) - sigma_X_e^2 / 2,
     so each grid point holds the enterprise *mean* fixed at theta*E[X_i] while
-    sigma_X_e reallocates that mean between body and tail — exactly the
+    sigma_X_e reallocates that mean between body and tail - exactly the
     concentration experiment of theory doc §7.
 
     Returns dict with E_TAM and gamma arrays of shape (len(n_es),

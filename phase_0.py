@@ -4,19 +4,19 @@ import scipy.stats as stats
 import matplotlib.pyplot as plt
 
 # ==============================================================================
-# PHASE 0 — CALIBRATION AND DATA
+# PHASE 0 - CALIBRATION AND DATA
 # Equilibrium TAM estimation for US AI token market (price-stability assumption)
 #
 # CORRECTIONS vs original:
 #   [FIX-1] Income calibration: Updated to CPS ASEC 2024/25 actuals (median=$40,480,
 #            mean=$59,430 for persons with $1+ earnings). Parameters dict now consistent.
 #   [FIX-2] mu_K_i anchor: Original range (-8.5,-6.9) implied only $8-$40/yr blended
-#            consumer ARPU — comment said "$20-$200/yr" but math was wrong. Corrected to
+#            consumer ARPU - comment said "$20-$200/yr" but math was wrong. Corrected to
 #            (-7.2,-5.3) covering $30-$200/yr, with sanity_check using -6.5 (~$80/yr
 #            blended across payers and free-tier users). Anchored to OpenAI US consumer
 #            revenue ~$5-7B / 100M US MAU => ~$50-70/yr blended ARPU.
 #   [FIX-3] mu_K_e and sigma_K_e: Original (mu=-4.0, sigma=1.2) produced E[X]=$30,946/firm
-#            and TAM_e=$154.7B — ~14x too high vs observed ~$8-11B US enterprise AI revenue.
+#            and TAM_e=$154.7B - ~14x too high vs observed ~$8-11B US enterprise AI revenue.
 #            Root cause: sigma^2_X=4.68 -> Jensen uplift of 10.4x dominated the mean.
 #            Fix: mu_K_e recalibrated to -6.7 (encoding ~10-15% adoption rate × ~$3k/yr
 #            conditional spend), sigma_K_e=1.2 retained (Pareto tail is real per Hill est.).
@@ -33,7 +33,7 @@ import matplotlib.pyplot as plt
 #            the equilibrium (stable-price, full-saturation) premium puts the US ceiling well
 #            above that. Re-anchored the macro constraint to $40-60B and lifted the two
 #            propensity centrals to land the central POINT estimate at ~$42B (the MC
-#            distribution shown on the dashboard sits higher — Base scenario median ~$54B —
+#            distribution shown on the dashboard sits higher - Base scenario median ~$54B -
 #            because convexity over the firm-size priors lifts the mean):
 #              mu_K_e: -6.74 -> -5.85  (TAM_e ~$10B -> ~$24B; encodes higher enterprise
 #                       adoption + conditional spend at equilibrium)
@@ -43,7 +43,7 @@ import matplotlib.pyplot as plt
 #            provider ARRs double-count (Azure<->OpenAI, Bedrock<->Anthropic), so the anchor is
 #            NOT the naive sum. The lognormal machinery is unchanged; only the level anchors moved.
 #            NOTE: TAM_i is consumer *subscription/token* spend (e.g. ChatGPT Plus/Pro), which IS
-#            in scope — the macro constraint now covers consumer + enterprise token demand, not
+#            in scope - the macro constraint now covers consumer + enterprise token demand, not
 #            "external API revenue only" as the prior (FIX-4) comment implied.
 #
 # UNCHANGED / CONFIRMED CORRECT:
@@ -178,7 +178,7 @@ parameters = {
     },
     "macro": {
         "current_tam_constraint": {
-            "desc": "US AI token demand — consumer + enterprise, equilibrium/2026 run-rate (annualized)",
+            "desc": "US AI token demand - consumer + enterprise, equilibrium/2026 run-rate (annualized)",
             "range": (40_000_000_000, 60_000_000_000),
             "source": "[FIX-6] Re-anchored from the 2025 actual window ($14-22B) to a 2026/equilibrium "
                       "window. OpenAI + Anthropic alone run-rate to >$70B combined ARR in 2026, "
@@ -241,7 +241,7 @@ def hill_estimator(data, k_fraction=0.01):
     For enterprise AI spend, alpha ~ 1.2-1.8 is plausible.
 
     [FIX-5] k_fraction changed from 0.05 to 0.01 (top 1% of firms).
-    With n=100,000 simulated firms, k=5,000 is too large — it samples deep into
+    With n=100,000 simulated firms, k=5,000 is too large - it samples deep into
     the lognormal body rather than the true Pareto tail, biasing alpha downward.
     k=1% (k=1,000) gives a better tail-index estimate while remaining stable.
     For production use with real SUSB microdata (~6M firms), k_fraction=0.005 or
@@ -315,7 +315,7 @@ print(f"  k = {k_used} (top 1%), threshold = ${threshold_val:,.0f}")
 print(f"  Estimated Pareto tail index alpha = {alpha_est:.4f}")
 print(f"  Interpretation: alpha={alpha_est:.2f} implies a {'heavy' if alpha_est < 2 else 'moderate'} tail.")
 print(f"  Variance {'is infinite (alpha<2)' if alpha_est < 2 else 'is finite'}; "
-      f"mean {'is infinite (alpha<1) — unexpected, check k' if alpha_est < 1 else 'is finite'}.")
+      f"mean {'is infinite (alpha<1) - unexpected, check k' if alpha_est < 1 else 'is finite'}.")
 print(f"  Consistent with Axtell (2001, Science): US firm size ~ Zipf law, alpha~1.0.")
 print(f"  Literature note: lognormal with sigma=2 mimics Pareto in the sample tail,")
 print(f"  making distributional discrimination (lognormal vs Pareto) difficult without")
@@ -336,13 +336,13 @@ def calculate_expected_segment_tam(N, mu_I, sigma_I, mu_K, sigma_K):
 
     Expected TAM = N * E[X] = N * exp(mu_I + mu_K + (sigma_I^2 + sigma_K^2) / 2)
 
-    IMPORTANT — Jensen uplift warning:
+    IMPORTANT - Jensen uplift warning:
         The term exp((sigma_I^2 + sigma_K^2)/2) is the variance multiplier.
         With sigma_I=1.8, sigma_K=1.2: this multiplier = exp(4.68/2) = 10.4x
         This means E[X] >> median(X). The median spend per firm is just exp(mu_I + mu_K).
         The TAM is dominated by the right tail. This is economically correct (top 1% of
         firms drive most enterprise AI spend) but means the model is sensitive to sigma
-        parameters — validate these carefully against real SUSB microdata.
+        parameters - validate these carefully against real SUSB microdata.
 
     Args:
         N       : number of agents in segment (persons or firms)
@@ -354,7 +354,7 @@ def calculate_expected_segment_tam(N, mu_I, sigma_I, mu_K, sigma_K):
     Returns:
         E_X         : expected per-agent spend (USD/yr)
         Expected_TAM: total segment TAM (USD/yr)
-        median_X    : median per-agent spend (USD/yr) — for sanity checking E_X
+        median_X    : median per-agent spend (USD/yr) - for sanity checking E_X
     """
     mu_X     = mu_I + mu_K
     sigma2_X = sigma_I**2 + sigma_K**2
@@ -469,7 +469,7 @@ for segment, params in parameters.items():
             "Description": meta["desc"],
             "Range Low":  meta["range"][0],
             "Range High": meta["range"][1],
-            "Units": meta.get("units", "—"),
+            "Units": meta.get("units", "-"),
             "Source (truncated)": meta["source"][:80] + "..." if len(meta["source"]) > 80 else meta["source"]
         })
 

@@ -122,7 +122,7 @@ def test_scenario_grid():
     # E[TAM] must be exactly N_i E[X_i] + N_e theta E[X_i] (mean-ratio pin)
     c = grid["consumer"]
     expect = c["n_i"] * c["e_xi"] + 5e6 * thetas * c["e_xi"]
-    got = grid["E_TAM"][1, 0, :]   # any sigma row — mean is sigma-free
+    got = grid["E_TAM"][1, 0, :]   # any sigma row - mean is sigma-free
     check("E[TAM] independent of sigma_X_e at fixed theta (mean pinned)",
           np.allclose(grid["E_TAM"][1, 0, :], grid["E_TAM"][1, -1, :]))
     check("E[TAM] matches N_i E[X_i] + N_e theta E[X_i]",

@@ -61,7 +61,7 @@ def main():
 
     # ----- diagnostics figure
     fig, axes = plt.subplots(2, 2, figsize=(12.5, 8.5))
-    fig.suptitle("Phase 2 Monte Carlo — US AI Inference TAM (annual USD, "
+    fig.suptitle("Phase 2 Monte Carlo - US AI Inference TAM (annual USD, "
                  "Phase 0 priors)", fontsize=13)
 
     # (a) running mean +/- 2SE

@@ -7,17 +7,17 @@ dropped into a report. A driver (run_phase4.py) wires them to data.
 
 Figures
 -------
-(a) fig_distribution   — TAM on a log axis, mean/median/P5-P95 marked.
-(b) fig_lorenz         — Lorenz curve + Gini of per-account enterprise spend;
+(a) fig_distribution   - TAM on a log axis, mean/median/P5-P95 marked.
+(b) fig_lorenz         - Lorenz curve + Gini of per-account enterprise spend;
                          annotates the share of TAM carried by the top 1%/0.1%.
-(c) fig_skew_heatmap   — EMPIRICAL skewness over (E[N_e], sigma_X_e) from
+(c) fig_skew_heatmap   - EMPIRICAL skewness over (E[N_e], sigma_X_e) from
                          simulation, with the corrected sigma_crit contour
                          (tam_core.sigma_crit_numeric) overlaid: a direct
                          simulation-vs-theory check of doc §7.
-(d) fig_qq_convergence — normal QQ plots of simulated TAM at several adoption
+(d) fig_qq_convergence - normal QQ plots of simulated TAM at several adoption
                          scales, visualizing Anscombe convergence and its tail
                          failure.
-(e) fig_waterfall      — additive decomposition of E[TAM] and Var(TAM) into
+(e) fig_waterfall      - additive decomposition of E[TAM] and Var(TAM) into
                          consumer vs enterprise layers.
 
 All simulation reuses the validated Phase 2 engine (tam_mc); no new estimators
@@ -83,7 +83,7 @@ def sample_enterprise_accounts(
     """Draw individual per-account enterprise spends (for concentration views).
 
     Uses exact lognormal (with cap if set). For the Lorenz/Gini figure we DO
-    want per-account draws — that is the object being measured — so this is the
+    want per-account draws - that is the object being measured - so this is the
     one place full draws are appropriate. Capped at a few million accounts for
     memory; the Gini of a lognormal is sample-size-stable.
     """
@@ -106,7 +106,7 @@ def empirical_skew_grid(
     """Empirical skewness of simulated TAM over an (E[N_e], sigma_X_e) grid.
 
     Consumer segment fixed; enterprise sigma_X varied by overriding sigma_K so
-    that var_X_log == sigma_xe^2 (mu_X held, so E[X_e] varies with sigma — same
+    that var_X_log == sigma_xe^2 (mu_X held, so E[X_e] varies with sigma - same
     convention as tam_core.sigma_crit_numeric). Uses the Phase 2 hybrid
     simulator for the enterprise total and the moment-matched draw for the
     consumer total. Returns array shape (len(sigma_xes), len(n_es)).
@@ -305,7 +305,7 @@ def fig_qq_convergence(
         ax.set_xlabel("normal quantile")
         ax.grid(alpha=0.3)
     axes[0].set_ylabel("standardized TAM quantile")
-    fig.suptitle("(d) Anscombe convergence — normal QQ of TAM vs adoption scale "
+    fig.suptitle("(d) Anscombe convergence - normal QQ of TAM vs adoption scale "
                  "(upper tail complies last)", fontsize=12)
     fig.tight_layout(rect=(0, 0, 1, 0.95))
     return fig
@@ -348,7 +348,7 @@ def fig_waterfall(
     ax1.set_title("E[TAM]: linear additive (mean scales with count)")
     ax1.grid(alpha=0.3, axis="y")
 
-    # Var(TAM) panel — report as the more interpretable SD-contribution sqrt(Var)
+    # Var(TAM) panel - report as the more interpretable SD-contribution sqrt(Var)
     # in $B, with the variance SHARE annotated. Consumer variance is ~5 orders
     # of magnitude below enterprise (the whole point), so a linear bar makes it
     # invisible; we annotate shares explicitly and use a log y-axis.

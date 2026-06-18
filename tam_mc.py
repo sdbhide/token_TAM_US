@@ -18,21 +18,20 @@ Population-simulation strategy (per the Phase 2 design notes)
 -------------------------------------------------------------
 * CONSUMER segment (N ~ 1e8): never draw 1e8 lognormals. The segment total is
   CLT-friendly, so we draw it from a SHIFTED-GAMMA matched to the exact first
-  three compound-sum moments from tam_core (mean, variance, AND skewness —
+  three compound-sum moments from tam_core (mean, variance, AND skewness -
   strictly better than a plain normal approximation).
 * ENTERPRISE segment (N ~ 5e6, heavy tail): HYBRID STRATIFIED simulation.
   The X_e distribution is split at a high quantile q (default 99.9th pct):
-    - TAIL stratum (top ~0.1%, ~5k firms): simulated EXACTLY — count drawn
+    - TAIL stratum (top ~0.1%, ~5k firms): simulated EXACTLY - count drawn
       Binomial(N_e, 1-q), spends drawn from the conditional lognormal above
       the threshold via inverse-CDF sampling. This is where TAM risk lives.
     - BODY stratum (bounded above by the threshold): its sum is extremely
       CLT-friendly; drawn from a shifted-gamma matched to the body's exact
       first three (lower-truncated lognormal) moments times the body count.
-  This concentrates random draws where the tail matters — stratification as
-  variance reduction — and reduces per-replication cost from O(N_e) to O(N_e/1000).
+  This concentrates random draws where the tail matters - stratification as
+  variance reduction - and reduces per-replication cost from O(N_e) to O(N_e/1000).
 
-Units: ANNUAL USD, matching Phase 0 (phase_0_corrected.py). NOTE: the v4 theory
-doc pinned monthly; annual is now the project convention — amend §2.1 of the doc.
+Units: ANNUAL USD, matching Phase 0 (phase_0.py) and §2.1 of the v4 theory doc.
 
 Validation contract (§9 of theory doc): simulated mean/variance/skewness at
 FIXED parameters must match tam_core closed forms within Monte Carlo error.
@@ -75,7 +74,7 @@ class Prior:
 
     kind:
       "uniform"    : U(low, high)
-      "triangular" : Triangular(low, mode, high) — use when Phase 0 supplies a
+      "triangular" : Triangular(low, mode, high) - use when Phase 0 supplies a
                      central anchor in addition to a range.
       "fixed"      : degenerate at `mode` (for acceptance tests / scenarios).
     """
@@ -221,7 +220,7 @@ def _segment_total_moment_matched(
 
     Used for the consumer segment. Count noise: with N in the 1e8 range and
     parameter uncertainty handled by the outer loop, Binomial-style count noise
-    is O(sqrt(N)) ~ 1e4 — utterly negligible against spend dispersion — so N is
+    is O(sqrt(N)) ~ 1e4 - utterly negligible against spend dispersion - so N is
     treated as fixed within a replication (deterministic-count CountParams).
     """
     counts = tc.CountParams(mean=float(n), var=0.0, mu3=0.0)
@@ -326,7 +325,7 @@ def simulate_segment_total(
     method:
       "moment" : shifted-gamma on compound moments (consumer default).
       "hybrid" : stratified exact-tail + moment-matched body (enterprise default).
-      "exact"  : brute force — n lognormal draws per rep. Validation only.
+      "exact"  : brute force - n lognormal draws per rep. Validation only.
       "auto"   : "hybrid" if sigma_X >= 1.5 (heavy tail), else "moment".
     """
     if method == "auto":
