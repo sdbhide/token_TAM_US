@@ -1,10 +1,9 @@
-# AI Inference Token TAM, Project Documentation
+# AI Inference Token TAM: Project Documentation
 
 A complete map of the modeling project: every module, test suite, and figure,
 with what it is, why it exists, and what it means for the overall estimate.
-Read this as the index; the theory lives in `ai_inference_tam_theory_v4.md`, an
-interactive view of the results lives in `assets/` (open `assets/index.html`),
-and the derivations and validations live in the code.
+Read this as the index; the theory lives in `ai_inference_tam_theory_v4.md` and
+the derivations/validations live in the code. Check the [dashboard](https://aitokentam.netlify.app/) here. 
 
 **Goal.** Estimate the US Total Addressable Market for LLM inference tokens, in
 USD at stable-price equilibrium, as a *distribution* (not a point), split into
