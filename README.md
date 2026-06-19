@@ -3,7 +3,7 @@
 A complete map of the modeling project: every module, test suite, and figure,
 with what it is, why it exists, and what it means for the overall estimate.
 Read this as the index; the theory lives in `ai_inference_tam_theory_v4.md` and
-the derivations/validations live in the code. Check the [dashboard](https://aitokentam.netlify.app/) here. 
+the derivations/validations live in the code. Check out the dashboard [here](https://aitokentam.netlify.app/) and the Substack link [here](https://open.substack.com/pub/shinbhide/p/how-big-is-the-us-market-for-ai?r=8mflhy&utm_campaign=post&utm_medium=web&showWelcomeOnShare=true). 
 
 **Goal.** Estimate the US Total Addressable Market for LLM inference tokens, in
 USD at stable-price equilibrium, as a *distribution* (not a point), split into
