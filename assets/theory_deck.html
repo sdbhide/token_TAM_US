@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="color-scheme" content="light" />
+<title>AI Inference Token TAM — Theory Deck</title>
+<style>
+:root{
+  --paper:#ffffff; --ink:#16212e; --mute:#5a6b7b; --faint:#8794a2;
+  --line:#d4dbe3; --hair:#e8edf2; --wash:#f5f7fa;
+  --consumer:#2f6f9f; --enterprise:#b06f23; --accent:#0f766e;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+  --serif:"Latin Modern Roman",Cambria,Georgia,"Times New Roman",serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#e9edf1;color:var(--ink);font-family:var(--sans);
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+
+/* ---------- stage ---------- */
+#viewport{position:fixed;inset:0;overflow:hidden;display:flex;align-items:center;justify-content:center}
+#stage{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
+.slide{position:absolute;inset:0;background:var(--paper);padding:42px 60px 38px;
+  display:none;flex-direction:column;box-shadow:0 8px 40px rgba(16,33,46,.16)}
+.slide.on{display:flex}
+
+/* ---------- slide chrome ---------- */
+.eyebrow{font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);
+  margin:0 0 8px;font-weight:600}
+.eyebrow .n{color:var(--accent)}
+h1.st{font-size:31px;line-height:1.13;margin:0;font-weight:650;letter-spacing:-.015em;max-width:24ch}
+h1.st.wide{max-width:34ch}
+.lede{font-size:14.2px;line-height:1.47;color:var(--mute);margin:9px 0 0;max-width:92ch}
+.rule{height:1px;background:var(--line);margin:14px 0 0}
+.body{flex:1;min-height:0;margin-top:16px;margin-bottom:8px}
+.pnum{position:absolute;right:60px;bottom:16px;font-size:10.5px;color:var(--faint);
+  font-family:var(--mono);letter-spacing:.06em}
+.brand{position:absolute;left:60px;bottom:16px;font-size:10.5px;color:var(--faint);letter-spacing:.05em}
+.takeaway{margin-top:auto;border-top:2px solid var(--accent);padding-top:9px;display:flex;gap:12px;
+  align-items:baseline}
+.takeaway .tk{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);
+  font-weight:700;flex:none;padding-top:2px}
+.takeaway p{margin:0;font-size:13.8px;line-height:1.42;color:var(--ink);font-weight:500;max-width:104ch}
+
+/* ---------- layout helpers ---------- */
+.cols{display:grid;gap:28px;height:100%}
+.c-2{grid-template-columns:1fr 1fr}
+.c-3{grid-template-columns:1fr 1fr 1fr}
+.c-58{grid-template-columns:1.05fr 1fr}
+.c-64{grid-template-columns:1.42fr 1fr}
+.c-46{grid-template-columns:1fr 1.5fr}
+.stack{display:flex;flex-direction:column;gap:14px;min-height:0}
+p.tx{margin:0;font-size:14px;line-height:1.55;color:var(--ink)}
+p.tx.mut{color:var(--mute)}
+.h3{font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--faint);
+  font-weight:700;margin:0 0 8px}
+strong{font-weight:640}
+em.k{font-style:normal;font-weight:640;color:var(--accent)}
+.hl-e{color:var(--enterprise);font-weight:640}
+.hl-c{color:var(--consumer);font-weight:640}
+
+/* ---------- math ---------- */
+.m{font-family:var(--serif);font-style:italic}
+.m .r{font-style:normal}
+.m sub,.m sup{font-style:normal;font-size:.66em;line-height:0}
+.m sub{font-style:italic}
+.eq{display:block;text-align:center;font-family:var(--serif);font-style:italic;
+  font-size:20px;line-height:1.75;margin:0;color:var(--ink)}
+.eq.sm{font-size:17px}
+.eq .r{font-style:normal}
+.eq sub,.eq sup{font-size:.64em;line-height:0}
+.eq sup{font-style:normal}
+.eqbox{background:var(--wash);border:1px solid var(--hair);border-radius:9px;padding:13px 15px}
+.eqbox.key{background:#fff;border:1.5px solid var(--accent)}
+.eqbox .cap{font-family:var(--sans);font-style:normal;font-size:11.5px;color:var(--mute);
+  text-align:center;display:block;margin-top:7px;line-height:1.4}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 .16em}
+.fr>b{font-weight:inherit;border-bottom:1.1px solid currentColor;padding:0 .32em .1em;font-style:inherit}
+.fr>i{padding:.12em .32em 0;font-style:inherit}
+.rt{display:inline-flex;align-items:stretch;vertical-align:-.16em}
+.rt>u{text-decoration:none;font-style:normal;transform:scaleY(1.3);transform-origin:center;
+  padding-right:.04em;font-size:1.02em}
+.rt>s{text-decoration:none;border-top:1.1px solid currentColor;padding:.16em .16em 0 .08em}
+.rt.big>u{font-size:1.55em;transform:scaleY(1.35)}
+.sg{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;
+  margin:0 .14em;line-height:1}
+.sg>u{text-decoration:none;font-size:.46em;font-style:italic;padding-bottom:.14em}
+.sg>b{font-weight:400;font-style:normal;font-size:1.42em;line-height:.86}
+.sg>i{font-size:.46em;font-style:italic;padding-top:.14em}
+.sg sub,.sg sup{font-size:.8em}
+
+/* ---------- components ---------- */
+.card{border:1px solid var(--line);border-radius:10px;padding:14px 15px;background:#fff}
+.card.wash{background:var(--wash);border-color:var(--hair)}
+.card .ct{font-size:13px;font-weight:660;margin:0 0 6px;letter-spacing:-.005em}
+.card .cb{font-size:12.8px;line-height:1.5;color:var(--mute);margin:0}
+.card.e{border-left:3px solid var(--enterprise)}
+.card.c{border-left:3px solid var(--consumer)}
+.card.a{border-left:3px solid var(--accent)}
+
+table{border-collapse:collapse;width:100%;font-size:12.8px}
+th{text-align:left;font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint);
+  font-weight:700;padding:0 10px 7px 0;border-bottom:1px solid var(--line)}
+.sym{text-transform:none;letter-spacing:0;font-family:var(--serif);font-style:italic}
+th .sym{font-size:12.5px}
+.h3 .sym,.kpi .k .lab .sym{font-size:1.18em}
+th.n,td.n{text-align:right;padding-right:0}
+td{padding:8px 10px 8px 0;border-bottom:1px solid var(--hair);color:var(--ink);vertical-align:top}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;padding-right:0}
+tr.tot td{border-bottom:none;font-weight:640}
+.sw{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:7px;vertical-align:.5px}
+.sw.c{background:var(--consumer)}.sw.e{background:var(--enterprise)}
+
+.alist{display:flex;flex-direction:column;gap:9px}
+.arow{display:grid;grid-template-columns:34px 1fr;gap:11px;align-items:start}
+.arow .tag{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--accent);
+  background:rgba(15,118,110,.09);border-radius:4px;padding:3px 0;text-align:center}
+.arow .txt{font-size:12.6px;line-height:1.45;color:var(--ink)}
+.arow .txt b{font-weight:640}
+.arow .txt .cav{color:var(--mute)}
+
+.notes{display:flex;flex-direction:column;gap:9px;margin:0;padding:0;list-style:none}
+.notes li{font-size:13px;line-height:1.5;color:var(--ink);padding-left:16px;position:relative}
+.notes li::before{content:"";position:absolute;left:0;top:8px;width:6px;height:6px;border-radius:50%;
+  background:var(--accent)}
+.notes li b{font-weight:640}
+.notes.sm li{font-size:12.4px}
+
+.figwrap{display:flex;flex-direction:column;justify-content:flex-start}
+.figwrap svg{width:100%;height:auto;display:block;flex:none}
+.figcap{font-size:11.5px;color:var(--mute);line-height:1.45;margin:9px 0 0;text-align:center}
+
+.kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.kpi .k{border:1px solid var(--line);border-radius:9px;padding:12px 13px;background:#fff}
+.kpi .k .lab{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);font-weight:700}
+.kpi .k .val{font-size:25px;font-weight:660;margin-top:5px;letter-spacing:-.02em;
+  font-variant-numeric:tabular-nums}
+.kpi .k .sub{font-size:11.5px;color:var(--mute);margin-top:3px;line-height:1.35}
+.kpi .k.e .val{color:var(--enterprise)} .kpi .k.c .val{color:var(--consumer)}
+.kpi .k.a .val{color:var(--accent)}
+
+.termbar{display:flex;gap:8px;margin-top:6px}
+.termbar .t{flex:1;border-radius:6px;padding:8px 10px;font-size:11.4px;line-height:1.4;
+  background:var(--wash);border:1px solid var(--hair);color:var(--mute)}
+.termbar .t b{display:block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink);margin-bottom:3px;font-weight:700}
+
+/* title slide */
+.title-slide{padding:0}
+.title-inner{flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 60px}
+.title-bar{height:5px;background:linear-gradient(90deg,var(--consumer) 0 42%,var(--enterprise) 42% 100%)}
+h1.big{font-size:52px;line-height:1.06;letter-spacing:-.028em;font-weight:660;margin:0;max-width:20ch}
+.title-sub{font-size:17px;line-height:1.5;color:var(--mute);margin:20px 0 0;max-width:62ch}
+.title-meta{display:flex;gap:0;margin-top:38px;border-top:1px solid var(--line);padding-top:18px}
+.title-meta>div{padding-right:34px;margin-right:34px;border-right:1px solid var(--hair)}
+.title-meta>div:last-child{border-right:none;margin-right:0;padding-right:0}
+.title-meta .l{font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--faint);font-weight:700}
+.title-meta .v{font-size:13.5px;margin-top:5px;color:var(--ink);line-height:1.4}
+
+/* appendix divider */
+.divider{justify-content:center;align-items:flex-start;padding-left:60px}
+.divider h1{font-size:44px;letter-spacing:-.025em;margin:0;font-weight:660}
+.divider p{font-size:16px;color:var(--mute);margin:14px 0 0;max-width:60ch;line-height:1.5}
+.divider .lbl{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);
+  font-weight:700;margin-bottom:14px}
+
+/* ---------- nav ---------- */
+#nav{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);display:flex;align-items:center;
+  gap:6px;background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:999px;
+  padding:5px 7px;box-shadow:0 2px 14px rgba(16,33,46,.13);z-index:20;
+  font-family:var(--sans);backdrop-filter:blur(6px);opacity:.35;transition:opacity .2s}
+#nav:hover,#nav.show{opacity:1}
+#nav button{border:0;background:transparent;color:var(--mute);cursor:pointer;font-size:15px;
+  width:28px;height:26px;border-radius:999px;font-family:inherit;line-height:1}
+#nav button:hover{background:var(--wash);color:var(--ink)}
+#nav .ctr{font-size:11.5px;color:var(--mute);font-family:var(--mono);min-width:52px;text-align:center;
+  font-variant-numeric:tabular-nums}
+#nav .hint{font-size:10.5px;color:var(--faint);padding:0 8px 0 4px;border-left:1px solid var(--hair);
+  margin-left:2px}
+#prog{position:fixed;top:0;left:0;height:2px;background:var(--accent);z-index:21;transition:width .22s ease}
+
+@media print{
+  @page{size:1280px 720px;margin:0}
+  html,body{background:#fff}
+  #viewport{position:static;overflow:visible;display:block}
+  #stage{transform:none!important;width:1280px;height:auto}
+  .slide{position:relative;display:flex!important;box-shadow:none;page-break-after:always;
+    break-after:page;height:720px}
+  #nav,#prog{display:none}
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<div id="viewport"><div id="stage">
+
+<!-- ============ 1 · TITLE ============ -->
+<!-- Add your name in the .title-meta "Prepared by" cell below. -->
+<section class="slide title-slide on">
+  <div class="title-bar"></div>
+  <div class="title-inner">
+    <p class="eyebrow" style="margin-bottom:18px">Theory note &middot; US AI inference tokens</p>
+    <h1 class="big">Sizing a market<br>that doesn't exist yet</h1>
+    <p class="title-sub">A closed-form structural framework for US inference-token expenditure &mdash;
+      and what its solutions predict about the shape of the answer before any data is loaded.</p>
+    <div class="title-meta">
+      <div><div class="l">Estimand</div><div class="v">Annual US spend on LLM<br>inference tokens, USD</div></div>
+      <div><div class="l">Object</div><div class="v">A distribution,<br>not a point</div></div>
+      <div><div class="l">Regime</div><div class="v">Stable-price<br>equilibrium</div></div>
+      <div><div class="l">Companion to</div><div class="v">The calibrated Monte Carlo<br>engine and dashboard</div></div>
+    </div>
+  </div>
+  <div class="brand">Theory layer &mdash; derivations, comparative statics, and diagnostics</div>
+  <div class="pnum">01</div>
+</section>
+
+<!-- ============ 2 · ARCHITECTURE ============ -->
+<section class="slide">
+  <p class="eyebrow"><span class="n">01</span> &nbsp;/&nbsp; Architecture</p>
+  <h1 class="st wide">One market, two stochastic processes</h1>
+  <p class="lede">The market is an additive sum of two compound processes. Bifurcation is not presentational:
+    it is what lets the retail and commercial tiers be calibrated, and go wrong, independently.</p>
+  <div class="rule"></div>
+  <div class="body cols c-46">
+    <div class="stack">
+      <div class="eqbox key">
+        <span class="eq sm">TAM = TAM<sub>i</sub> + TAM<sub>e</sub> =
+          <span class="sg"><u>N<sub>i</sub></u><b>&#8721;</b><i>j=1</i></span>
+          X<sub>i,j</sub> &nbsp;+&nbsp;
+          <span class="sg"><u>N<sub>e</sub></u><b>&#8721;</b><i>k=1</i></span>
+          X<sub>e,k</sub></span>
+        <span class="cap">N<sub>s</sub> = adopting units in segment s &nbsp;&middot;&nbsp;
+          X<sub>s</sub> = annual spend per unit</span>
+      </div>
+      <p class="tx"><strong>Why a compound sum.</strong> Two independent sources of ignorance sit in this market:
+        how many buyers there will be, and how much each spends. A point estimate multiplies two guesses and
+        discards both error terms. A compound sum propagates them &mdash; and their interaction is exactly
+        what the third moment picks up.</p>
+      <p class="tx"><strong>Why bifurcate.</strong> No single distribution holds a
+        <span class="hl-c">$179</span> consumer mean and a <span class="hl-e">$4,866</span> enterprise mean
+        with a 129&times; gap in tail weight without distorting both. Two segments cost four parameters and
+        buy independent calibration, independent levers, and a clean variance attribution.</p>
+    </div>
+    <div class="stack">
+      <div>
+        <p class="h3">Assumptions, and where they bind</p>
+        <div class="alist">
+          <div class="arow"><div class="tag">A1</div><div class="txt"><b>i.i.d. within segment.</b>
+            <span class="cav">Spends are exchangeable given the segment. Heterogeneity lives in the
+            lognormal, not across units.</span></div></div>
+          <div class="arow"><div class="tag">A2</div><div class="txt"><b>Counts &#8869; spends.</b>
+            <span class="cav">Violated at partial penetration &mdash; early adopters skew high-income.
+            Approximately holds at the saturation equilibrium being priced.</span></div></div>
+          <div class="arow"><div class="tag">A3</div><div class="txt"><b>Segments independent.</b>
+            <span class="cav">Common shocks make this false and the direction is known: independence
+            <i>understates</i> variance. A covariance term is carried explicitly.</span></div></div>
+          <div class="arow"><div class="tag">A4</div><div class="txt"><b>Stable prices.</b>
+            <span class="cav">TAM = price &times; volume with price fixed. Jevons-type demand response to
+            falling token prices is out of scope, not assumed away.</span></div></div>
+        </div>
+      </div>
+      <div style="margin-top:auto">
+        <p class="h3">The object being summed</p>
+        <svg viewBox="0 0 660 122" style="width:100%;height:auto;display:block" role="img"
+             aria-label="Each segment multiplies a random count by a random per-unit spend; the two segment totals add">
+          <g font-family="-apple-system,Segoe UI,Roboto,sans-serif">
+          <g>
+            <rect x="1" y="4" width="146" height="42" rx="7" fill="#fff" stroke="#2f6f9f" stroke-width="1.4"/>
+            <text x="74" y="22" text-anchor="middle" font-size="13" font-weight="650" fill="#16212e" font-style="italic">N&#8202;<tspan font-size="10" dy="2">i</tspan></text>
+            <text x="74" y="37" text-anchor="middle" font-size="10.5" fill="#5a6b7b">adopting consumers</text>
+            <text x="161" y="30" text-anchor="middle" font-size="15" fill="#5a6b7b">&#215;</text>
+            <rect x="175" y="4" width="168" height="42" rx="7" fill="#fff" stroke="#2f6f9f" stroke-width="1.4"/>
+            <text x="259" y="22" text-anchor="middle" font-size="13" font-weight="650" fill="#16212e" font-style="italic">X&#8202;<tspan font-size="10" dy="2">i</tspan><tspan dy="-2" font-style="normal" font-weight="400"> ~ Lognormal</tspan></text>
+            <text x="259" y="37" text-anchor="middle" font-size="10.5" fill="#5a6b7b">annual spend per unit</text>
+            <path d="M349 25 H392" stroke="#c9d2dc" stroke-width="1.4"/><path d="M392 25 l-6 -3.4 v6.8 z" fill="#c9d2dc"/>
+            <text x="443" y="30" text-anchor="middle" font-size="14" font-weight="650" fill="#2f6f9f" font-style="italic">TAM&#8202;<tspan font-size="10.5" dy="2">i</tspan></text>
+          </g>
+          <g>
+            <rect x="1" y="76" width="146" height="42" rx="7" fill="#fff" stroke="#b06f23" stroke-width="1.4"/>
+            <text x="74" y="94" text-anchor="middle" font-size="13" font-weight="650" fill="#16212e" font-style="italic">N&#8202;<tspan font-size="10" dy="2">e</tspan></text>
+            <text x="74" y="109" text-anchor="middle" font-size="10.5" fill="#5a6b7b">adopting accounts</text>
+            <text x="161" y="102" text-anchor="middle" font-size="15" fill="#5a6b7b">&#215;</text>
+            <rect x="175" y="76" width="168" height="42" rx="7" fill="#fff" stroke="#b06f23" stroke-width="1.4"/>
+            <text x="259" y="94" text-anchor="middle" font-size="13" font-weight="650" fill="#16212e" font-style="italic">X&#8202;<tspan font-size="10" dy="2">e</tspan><tspan dy="-2" font-style="normal" font-weight="400"> ~ Lognormal</tspan></text>
+            <text x="259" y="109" text-anchor="middle" font-size="10.5" fill="#5a6b7b">annual spend per unit</text>
+            <path d="M349 97 H392" stroke="#c9d2dc" stroke-width="1.4"/><path d="M392 97 l-6 -3.4 v6.8 z" fill="#c9d2dc"/>
+            <text x="443" y="102" text-anchor="middle" font-size="14" font-weight="650" fill="#b06f23" font-style="italic">TAM&#8202;<tspan font-size="10.5" dy="2">e</tspan></text>
+          </g>
+          <path d="M486 25 H512 V97 H486" fill="none" stroke="#c9d2dc" stroke-width="1.4"/>
+          <path d="M512 61 H546" stroke="#c9d2dc" stroke-width="1.4"/><path d="M546 61 l-6 -3.4 v6.8 z" fill="#c9d2dc"/>
+          <rect x="552" y="40" width="107" height="42" rx="7" fill="#f5f7fa" stroke="#0f766e" stroke-width="1.5"/>
+          <text x="605" y="66" text-anchor="middle" font-size="16" font-weight="650" fill="#0f766e" font-style="italic">TAM</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <div class="takeaway"><span class="tk">Behaviour</span>
+    <p>The mean of this object is easy and almost uninformative. Everything decision-relevant &mdash; tail risk,
+      whether error bars are legal, which parameter to spend calibration effort on &mdash; lives in the second
+      and third moments, which is what the rest of the framework solves for.</p></div>
+  <div class="brand">AI inference token TAM &middot; theory</div><div class="pnum">02</div>
+</section>
+
+<!-- ============ 3 · UNIT SPEND ============ -->
+<section class="slide">
+  <p class="eyebrow"><span class="n">02</span> &nbsp;/&nbsp; Unit spend</p>
+  <h1 class="st wide">Separating capacity to spend from propensity to spend</h1>
+  <p class="lede">Per-unit expenditure is modelled as a product of an observable scale factor and an
+    unobservable share. The product of two lognormals is lognormal, so the decomposition is free.</p>
+  <div class="rule"></div>
+  <div class="body cols c-58">
+    <div class="stack">
+      <div class="eqbox">
+        <span class="eq">X<sub>i</sub> = K<sub>i</sub> &middot; I<sub>i</sub>
+          &nbsp;&nbsp;&nbsp;&nbsp; X<sub>e</sub> = K<sub>e</sub> &middot; I<sub>e</sub></span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="card c"><p class="ct"><span class="m">I</span> &mdash; the base</p>
+          <p class="cb">Personal income for consumers; IT-budget / firm scale for enterprises.
+            Externally observable, externally calibrated. Carries no opinion about AI.</p></div>
+        <div class="card e"><p class="ct"><span class="m">K</span> &mdash; the share</p>
+          <p class="cb">Fraction of that base spent on inference. The genuinely unknown object, and the
+            one every disagreement about this market is actually about.</p></div>
+      </div>
+      <div class="eqbox key">
+        <span class="eq sm">&#956;<sub>X,s</sub> = &#956;<sub>I,s</sub> + &#956;<sub>K,s</sub>
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          &#963;<sup>2</sup><sub style="margin-left:-.55em">X,s</sub> =
+          &#963;<sup>2</sup><sub style="margin-left:-.55em">I,s</sub> +
+          &#963;<sup>2</sup><sub style="margin-left:-.55em">K,s</sub> +
+          2&#961;<sub>s</sub>&#963;<sub>I,s</sub>&#963;<sub>K,s</sub></span>
+        <span class="cap">Log-scales add; log-dispersions add with a correlation cross-term</span>
+      </div>
+      <p class="tx" style="margin-top:auto"><strong>Why this closure matters.</strong> Because the product
+        stays lognormal, the entire moment machinery downstream &mdash; truncation, compound sums, the
+        convergence diagnostic &mdash; keeps working on a two-parameter object. The decomposition buys
+        interpretability at literally no analytical cost, which is rare enough to be worth naming.</p>
+    </div>
+    <div class="stack">
+      <p class="h3">What <span class="sym">&#961;</span> does &mdash; and why it is the cheapest parameter here</p>
+      <ul class="notes">
+        <li><b>Consumers: &#961;&nbsp;&lt;&nbsp;0.</b> Engel-curve behaviour &mdash; the token share of income
+          falls as income rises. A negative &#961; <i>shrinks</i> &#963;<sub class="m">X</sub>, thinning the
+          consumer tail.</li>
+        <li><b>Enterprises: &#961;&nbsp;&gt;&nbsp;0.</b> Agent fleets scale super-linearly with firm size, so
+          large firms spend a larger share of a larger base. This fattens the tail from both ends.</li>
+        <li><b>&#961; = 0 recovers the independent case exactly.</b> One extra parameter per segment, zero loss
+          of tractability &mdash; and it enters &#963;<sup>2</sup> linearly but skewness exponentially.</li>
+      </ul>
+      <table style="margin-top:4px">
+        <tr><th>Calibrated unit spend</th><th class="n"><span class="sym">&#956;<sub>X</sub></span></th><th class="n"><span class="sym">&#963;<sub>X</sub></span></th><th class="n">E[X]</th></tr>
+        <tr><td><span class="sw c"></span>Consumer</td><td class="num">4.559</td><td class="num">1.121</td><td class="num">$179</td></tr>
+        <tr class="tot"><td><span class="sw e"></span>Enterprise</td><td class="num">6.150</td><td class="num">2.163</td><td class="num">$4,866</td></tr>
+      </table>
+      <div class="card wash" style="margin-top:auto"><p class="cb">The baseline calibration sets
+        &#961; = 0 in both segments &mdash; not because independence is believed, but because the sign is
+        confidently known and the magnitude is not. It is the first refinement to buy, and the cheapest.</p></div>
+    </div>
+  </div>
+  <div class="takeaway"><span class="tk">Behaviour</span>
+    <p>The two segments differ far more in dispersion than in level: &#963;<sub class="m">X</sub> is
+      <strong>1.9&times;</strong> larger for enterprises, and because dispersion enters the moments through
+      e<sup>&#963;&sup2;</sup>, that gap is what produces every asymmetry downstream.</p></div>
+  <div class="brand">AI inference token TAM &middot; theory</div><div class="pnum">03</div>
+</section>
+
+<!-- ============ 4 · MOMENTS ============ -->
+<section class="slide">
+  <p class="eyebrow"><span class="n">03</span> &nbsp;/&nbsp; Moments</p>
+  <h1 class="st wide">One quantity governs the entire model: e<sup style="font-size:.55em">&#963;&sup2;</sup></h1>
+  <p class="lede">For a lognormal, location and shape separate cleanly. &#956; scales the distribution;
+    &#963; alone decides what it looks like.</p>
+  <div class="rule"></div>
+  <div class="body cols c-58">
+    <div class="stack">
+      <div class="eqbox">
+        <span class="eq sm">E[X] = e<sup>&#956; + &#963;&sup2;/2</sup></span>
+        <span class="eq sm">Var(X) = (e<sup>&#963;&sup2;</sup> &minus; 1) e<sup>2&#956; + &#963;&sup2;</sup></span>
+        <span class="eq sm">&#956;<sub>3</sub>(X) = (e<sup>&#963;&sup2;</sup> + 2)
+          <span class="rt"><u>&#8730;</u><s>e<sup>&#963;&sup2;</sup> &minus; 1</s></span>
+          &middot; Var(X)<sup>3/2</sup></span>
+      </div>
+      <p class="tx">Divide through and the location term vanishes entirely:</p>
+      <div class="eqbox key">
+        <span class="eq sm">CV(X) = <span class="rt"><u>&#8730;</u><s>e<sup>&#963;&sup2;</sup> &minus; 1</s></span>
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          &#947;(X) = (e<sup>&#963;&sup2;</sup> + 2)
+          <span class="rt"><u>&#8730;</u><s>e<sup>&#963;&sup2;</sup> &minus; 1</s></span></span>
+        <span class="cap">Both are functions of &#963; alone. &#956; moves the market; &#963; shapes it.</span>
+      </div>
+      <div style="margin-top:auto">
+        <p class="h3">The same parameter, read as a concentration measure</p>
+        <div class="eqbox">
+          <span class="eq sm">mean / median = e<sup>&#963;&sup2;/2</sup></span>
+          <span class="cap">The wedge between the typical unit and the average unit &mdash; the object that
+            reappears as &#952; vs &#952;<sub>med</sub></span>
+        </div>
+      </div>
+    </div>
+    <div class="stack">
+      <p class="h3">The consequence, at calibration</p>
+      <div class="kpi" style="grid-template-columns:1fr 1fr">
+        <div class="k c"><div class="lab">Consumer <span class="sym">&#947;</span>(X)</div><div class="val">8.8</div>
+          <div class="sub">at &#963;<sub class="m">X,i</sub> = 1.121</div></div>
+        <div class="k e"><div class="lab">Enterprise <span class="sym">&#947;</span>(X)</div><div class="val">1,134</div>
+          <div class="sub">at &#963;<sub class="m">X,e</sub> = 2.163</div></div>
+      </div>
+      <ul class="notes sm">
+        <li>A <b>1.9&times;</b> difference in &#963; produces a <b>129&times;</b> difference in unit-level
+          skewness, because &#963; enters through e<sup>&#963;&sup2;</sup>: doubling &#963; quadruples the
+          exponent.</li>
+        <li>This is the formal content of "enterprise AI spend is concentrated in a handful of accounts."
+          It is not an anecdote about hyperscalers &mdash; it is a single parameter.</li>
+        <li>Every downstream question &mdash; convergence, tail risk, whether a normal confidence interval is
+          admissible &mdash; therefore reduces to <b>&#963;<sub class="m">X,e</sub></b>. The sensitivity
+          analysis rediscovers this numerically; the algebra says it in one line.</li>
+        <li>It also sets the ceiling on precision. Because
+          &#963;<sub class="m">X</sub><sup>2</sup> = &#963;<sub class="m">I</sub><sup>2</sup> +
+          &#963;<sub class="m">K</sub><sup>2</sup> + 2&#961;&#963;<sub class="m">I</sub>&#963;<sub class="m">K</sub>,
+          and &#963;<sub class="m">I</sub> is externally observable, the only dispersion left to argue about is
+          the penetration rate &mdash; which is where calibration effort belongs.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="takeaway"><span class="tk">Behaviour</span>
+    <p>Shape is a one-parameter family. Any intervention that does not move
+      &#963;<sub class="m">X,e</sub> &mdash; more simulation draws, finer population data, a better mean
+      estimate &mdash; leaves the risk profile of the answer exactly where it was.</p></div>
+  <div class="brand">AI inference token TAM &middot; theory</div><div class="pnum">04</div>
+</section>
+
+<!-- ============ 5 · TRUNCATION ============ -->
+<section class="slide">
+  <p class="eyebrow"><span class="n">04</span> &nbsp;/&nbsp; Truncation</p>
+  <h1 class="st wide">The hard cap is a first-order choice, not a refinement</h1>
+  <p class="lede">No firm spends more than its IT budget; no consumer spends more than disposable income.
+    An unbounded tail on a bounded quantity is a modelling error, and it surfaces in the third moment first.</p>
+  <div class="rule"></div>
+  <div class="body cols c-2">
+    <div class="figwrap"><svg viewBox="0 0 600 372" role="img" aria-label="Aggregate skewness versus enterprise log-dispersion, uncapped versus a 60 million dollar cap">
+<line x1="54" y1="326.0" x2="454" y2="326.0" stroke="#e8edf2"/>
+<text x="45" y="330.5" text-anchor="end" fill="#5a6b7b" font-size="12.5">0.01</text>
+<line x1="54" y1="265.2" x2="454" y2="265.2" stroke="#e8edf2"/>
+<text x="45" y="269.7" text-anchor="end" fill="#5a6b7b" font-size="12.5">0.1</text>
+<line x1="54" y1="204.4" x2="454" y2="204.4" stroke="#e8edf2"/>
+<text x="45" y="208.9" text-anchor="end" fill="#5a6b7b" font-size="12.5">1</text>
+<line x1="54" y1="143.6" x2="454" y2="143.6" stroke="#e8edf2"/>
+<text x="45" y="148.1" text-anchor="end" fill="#5a6b7b" font-size="12.5">10</text>
+<line x1="54" y1="82.8" x2="454" y2="82.8" stroke="#e8edf2"/>
+<text x="45" y="87.3" text-anchor="end" fill="#5a6b7b" font-size="12.5">100</text>
+<line x1="54" y1="22.0" x2="454" y2="22.0" stroke="#e8edf2"/>
+<text x="45" y="26.5" text-anchor="end" fill="#5a6b7b" font-size="12.5">1,000</text>
+<text x="90.4" y="345" text-anchor="middle" fill="#5a6b7b" font-size="12.5">1.0</text>
+<line x1="90.4" y1="326" x2="90.4" y2="330" stroke="#c9d2dc"/>
+<text x="181.3" y="345" text-anchor="middle" fill="#5a6b7b" font-size="12.5">1.5</text>
+<line x1="181.3" y1="326" x2="181.3" y2="330" stroke="#c9d2dc"/>
+<text x="272.2" y="345" text-anchor="middle" fill="#5a6b7b" font-size="12.5">2.0</text>
+<line x1="272.2" y1="326" x2="272.2" y2="330" stroke="#c9d2dc"/>
+<text x="363.1" y="345" text-anchor="middle" fill="#5a6b7b" font-size="12.5">2.5</text>
+<line x1="363.1" y1="326" x2="363.1" y2="330" stroke="#c9d2dc"/>
+<text x="454.0" y="345" text-anchor="middle" fill="#5a6b7b" font-size="12.5">3.0</text>
+<line x1="454.0" y1="326" x2="454.0" y2="330" stroke="#c9d2dc"/>
+<polyline points="54.0,278.7 55.7,278.7 57.3,278.7 59.0,278.7 60.7,278.7 62.4,278.7 64.0,278.7 65.7,278.7 67.4,278.7 69.1,278.7 70.7,278.7 72.4,278.7 74.1,278.7 75.8,278.7 77.4,278.7 79.1,278.7 80.8,278.7 82.5,278.7 84.1,278.7 85.8,278.7 87.5,278.7 89.1,278.7 90.8,278.7 92.5,278.7 94.2,278.7 95.8,278.7 97.5,278.7 99.2,278.7 100.9,278.7 102.5,278.7 104.2,278.7 105.9,278.7 107.6,278.7 109.2,278.7 110.9,278.7 112.6,278.7 114.3,278.7 115.9,278.7 117.6,278.7 119.3,278.7 120.9,278.7 122.6,278.7 124.3,278.7 126.0,278.7 127.6,278.7 129.3,278.7 131.0,278.7 132.7,278.7 134.3,278.7 136.0,278.7 137.7,278.7 139.4,278.7 141.0,278.7 142.7,278.7 144.4,278.7 146.1,278.7 147.7,278.7 149.4,278.7 151.1,278.7 152.7,278.7 154.4,278.7 156.1,278.7 157.8,278.7 159.4,278.7 161.1,278.7 162.8,278.7 164.5,278.7 166.1,278.7 167.8,278.7 169.5,278.7 171.2,278.7 172.8,278.7 174.5,278.7 176.2,278.7 177.8,278.7 179.5,278.7 181.2,278.7 182.9,278.7 184.5,278.7 186.2,278.7 187.9,278.7 189.6,278.7 191.2,278.7 192.9,278.7 194.6,278.7 196.3,278.7 197.9,278.7 199.6,278.7 201.3,278.7 203.0,278.7 204.6,278.7 206.3,278.7 208.0,278.7 209.6,278.7 211.3,278.7 213.0,278.7 214.7,278.7 216.3,278.7 218.0,278.7 219.7,278.7 221.4,278.7 223.0,278.7 224.7,278.7 226.4,278.7 228.1,278.7 229.7,278.7 231.4,278.7 233.1,278.7 234.8,278.7 236.4,278.2 238.1,276.9 239.8,275.6 241.4,274.3 243.1,273.0 244.8,271.7 246.5,270.3 248.1,269.0 249.8,267.6 251.5,266.3 253.2,264.9 254.8,263.6 256.5,262.2 258.2,260.8 259.9,259.4 261.5,258.0 263.2,256.6 264.9,255.2 266.6,253.8 268.2,252.4 269.9,251.0 271.6,249.5 273.2,248.1 274.9,246.6 276.6,245.2 278.3,243.7 279.9,242.3 281.6,240.8 283.3,239.3 285.0,237.8 286.6,236.3 288.3,234.8 290.0,233.3 291.7,231.8 293.3,230.2 295.0,228.7 296.7,227.2 298.4,225.6 300.0,224.1 301.7,222.5 303.4,220.9 305.0,219.4 306.7,217.8 308.4,216.2 310.1,214.6 311.7,213.0 313.4,211.4 315.1,209.8 316.8,208.2 318.4,206.5 320.1,204.9 321.8,203.2 323.5,201.6 325.1,199.9 326.8,198.3 328.5,196.6 330.2,194.9 331.8,193.2 333.5,191.5 335.2,189.8 336.8,188.1 338.5,186.4 340.2,184.7 341.9,182.9 343.5,181.2 345.2,179.5 346.9,177.7 348.6,176.0 350.2,174.2 351.9,172.4 353.6,170.7 355.3,168.9 356.9,167.1 358.6,165.3 360.3,163.5 361.9,161.7 363.6,159.8 365.3,158.0 367.0,156.2 368.6,154.4 370.3,152.5 372.0,150.7 373.7,148.8 375.3,146.9 377.0,145.1 378.7,143.2 380.4,141.3 382.0,139.4 383.7,137.5 385.4,135.6 387.1,133.7 388.7,131.8 390.4,129.8 392.1,127.9 393.7,125.9 395.4,124.0 397.1,122.0 398.8,120.1 400.4,118.1 402.1,116.1 403.8,114.2 405.5,112.2 407.1,110.2 408.8,108.2 410.5,106.2 412.2,104.2 413.8,102.1 415.5,100.1 417.2,98.1 418.9,96.0 420.5,94.0 422.2,91.9 423.9,89.9 425.5,87.8 427.2,85.7 428.9,83.6 430.6,81.5 432.2,79.4 433.9,77.3 435.6,75.2 437.3,73.1 438.9,71.0 440.6,68.9 442.3,66.7 444.0,64.6 445.6,62.4 447.3,60.3 449.0,58.1 450.7,55.9 452.3,53.8 454.0,51.6" fill="none" stroke="#b06f23" stroke-width="2.4" stroke-linejoin="round"/>
+<text x="463" y="56.1" fill="#b06f23" font-size="13" font-weight="650">no cap</text>
+<polyline points="54.0,282.3 55.7,282.3 57.3,282.3 59.0,282.3 60.7,282.3 62.4,282.3 64.0,282.3 65.7,282.3 67.4,282.3 69.1,282.3 70.7,282.3 72.4,282.3 74.1,282.3 75.8,282.3 77.4,282.3 79.1,282.3 80.8,282.3 82.5,282.3 84.1,282.3 85.8,282.3 87.5,282.3 89.1,282.3 90.8,282.3 92.5,282.3 94.2,282.3 95.8,282.3 97.5,282.3 99.2,282.3 100.9,282.3 102.5,282.3 104.2,282.3 105.9,282.3 107.6,282.3 109.2,282.3 110.9,282.3 112.6,282.3 114.3,282.3 115.9,282.3 117.6,282.3 119.3,282.3 120.9,282.3 122.6,282.3 124.3,282.3 126.0,282.3 127.6,282.3 129.3,282.3 131.0,282.3 132.7,282.3 134.3,282.3 136.0,282.3 137.7,282.3 139.4,282.3 141.0,282.3 142.7,282.3 144.4,282.3 146.1,282.3 147.7,282.3 149.4,282.3 151.1,282.3 152.7,282.3 154.4,282.3 156.1,282.3 157.8,282.3 159.4,282.3 161.1,282.3 162.8,282.3 164.5,282.3 166.1,282.3 167.8,282.3 169.5,282.3 171.2,282.3 172.8,282.3 174.5,282.3 176.2,282.3 177.8,282.3 179.5,282.3 181.2,282.3 182.9,282.3 184.5,282.3 186.2,282.3 187.9,282.3 189.6,282.3 191.2,282.3 192.9,282.3 194.6,282.3 196.3,282.3 197.9,282.3 199.6,282.3 201.3,282.3 203.0,282.3 204.6,282.3 206.3,282.3 208.0,282.3 209.6,282.3 211.3,282.3 213.0,282.3 214.7,282.3 216.3,282.3 218.0,282.3 219.7,282.3 221.4,282.3 223.0,282.3 224.7,282.3 226.4,282.3 228.1,282.3 229.7,282.3 231.4,282.3 233.1,282.3 234.8,282.3 236.4,282.0 238.1,281.1 239.8,280.2 241.4,279.3 243.1,278.5 244.8,277.7 246.5,276.9 248.1,276.2 249.8,275.5 251.5,274.8 253.2,274.1 254.8,273.5 256.5,272.9 258.2,272.3 259.9,271.8 261.5,271.3 263.2,270.8 264.9,270.4 266.6,270.0 268.2,269.6 269.9,269.2 271.6,268.9 273.2,268.6 274.9,268.3 276.6,268.1 278.3,267.9 279.9,267.7 281.6,267.5 283.3,267.4 285.0,267.3 286.6,267.2 288.3,267.1 290.0,267.1 291.7,267.1 293.3,267.1 295.0,267.1 296.7,267.2 298.4,267.2 300.0,267.3 301.7,267.5 303.4,267.6 305.0,267.7 306.7,267.9 308.4,268.1 310.1,268.3 311.7,268.5 313.4,268.7 315.1,269.0 316.8,269.2 318.4,269.5 320.1,269.8 321.8,270.1 323.5,270.4 325.1,270.7 326.8,271.0 328.5,271.4 330.2,271.7 331.8,272.1 333.5,272.4 335.2,272.8 336.8,273.2 338.5,273.5 340.2,273.9 341.9,274.3 343.5,274.7 345.2,275.1 346.9,275.5 348.6,276.0 350.2,276.4 351.9,276.8 353.6,277.2 355.3,277.7 356.9,278.1 358.6,278.5 360.3,279.0 361.9,279.4 363.6,279.8 365.3,280.3 367.0,280.7 368.6,281.2 370.3,281.6 372.0,282.1 373.7,282.5 375.3,283.0 377.0,283.4 378.7,283.9 380.4,284.3 382.0,284.8 383.7,285.2 385.4,285.7 387.1,286.1 388.7,286.6 390.4,287.0 392.1,287.5 393.7,287.9 395.4,288.4 397.1,288.8 398.8,289.3 400.4,289.7 402.1,290.1 403.8,290.6 405.5,291.0 407.1,291.4 408.8,291.9 410.5,292.3 412.2,292.7 413.8,293.2 415.5,293.6 417.2,294.0 418.9,294.5 420.5,294.9 422.2,295.3 423.9,295.7 425.5,296.1 427.2,296.5 428.9,297.0 430.6,297.4 432.2,297.8 433.9,298.2 435.6,298.6 437.3,299.0 438.9,299.4 440.6,299.8 442.3,300.2 444.0,300.6 445.6,300.9 447.3,301.3 449.0,301.7 450.7,302.1 452.3,302.5 454.0,302.9" fill="none" stroke="#2f6f9f" stroke-width="2.4" stroke-linejoin="round"/>
+<text x="463" y="307.4" fill="#2f6f9f" font-size="13" font-weight="650">cap $60M/yr</text>
+<line x1="54" y1="265.2" x2="454" y2="265.2" stroke="#16212e" stroke-width="1.3" stroke-dasharray="5 4"/>
+<text x="463" y="269.7" fill="#16212e" font-size="12.5">tolerance &#949;=0.1</text>
+<line x1="253.8" y1="22" x2="253.8" y2="326" stroke="#5a6b7b" stroke-width="1" stroke-dasharray="2 3"/>
+<text x="246.8" y="35" text-anchor="end" fill="#5a6b7b" font-size="11.5">&#963;<tspan font-size="9" dy="2">crit</tspan><tspan dy="-2">=1.90</tspan></text>
+<circle cx="301.9" cy="222.4" r="5.5" fill="#b06f23" stroke="#fff" stroke-width="2"><title>calibrated: sigma_X,e=2.163, gamma=0.507</title></circle>
+<text x="291.9" y="215.4" text-anchor="end" fill="#16212e" font-size="12.5" font-weight="650">calibrated &#947;=0.51</text>
+<circle cx="301.9" cy="267.5" r="5.5" fill="#2f6f9f" stroke="#fff" stroke-width="2"><title>with $60M cap: gamma=0.092</title></circle>
+<text x="311.9" y="284.5" fill="#2f6f9f" font-size="12.5" font-weight="650">&#947;=0.09</text>
+<line x1="54" y1="326" x2="454" y2="326" stroke="#c9d2dc"/><line x1="54" y1="22" x2="54" y2="326" stroke="#c9d2dc"/>
+<text x="254" y="366" text-anchor="middle" fill="#5a6b7b" font-size="12">enterprise log-dispersion &#963;<tspan font-size="9.5" dy="2">X,e</tspan></text>
+<text transform="translate(14,174) rotate(-90)" text-anchor="middle" fill="#5a6b7b" font-size="12">aggregate skewness &#947; (log scale)</text>
+</svg>
+      <p class="figcap">Exact aggregate skewness against enterprise log-dispersion, all else held at
+        calibration. The two curves separate by four orders of magnitude by &#963; = 3.</p>
+    </div>
+    <div class="stack">
+      <div class="eqbox">
+        <span class="eq sm">E[X<sup>k</sup> | X &#8804; c] = e<sup>k&#956; + k&sup2;&#963;&sup2;/2</sup>
+          &middot; <span class="fr"><b><span class="r">&#934;</span>(d<sub>k</sub>)</b><i><span class="r">&#934;</span>(d<sub>0</sub>)</i></span>,
+          &nbsp;&nbsp;
+          d<sub>k</sub> = <span class="fr"><b>ln c &minus; &#956; &minus; k&#963;&sup2;</b><i>&#963;</i></span></span>
+        <span class="cap">Raw moments stay closed-form under truncation; central moments follow mechanically</span>
+      </div>
+      <ul class="notes sm">
+        <li><b>A pure shape instrument.</b> A $60M/yr cap moves the enterprise mean from $4,866 to $4,863
+          &mdash; three dollars &mdash; while cutting aggregate skewness <b>0.51 &#8594; 0.09</b>. It buys
+          tractability without moving the headline.</li>
+        <li><b>It voids the asymptotics.</b> Truncation destroys the e<sup>3&#963;&sup2;</sup> behaviour every
+          approximation ahead rests on. Under a cap only the exact expression applies &mdash; which is why the
+          production solver works on exact moments.</li>
+        <li><b>It makes &#947; non-monotone in &#963;.</b> Past a point, extra dispersion no longer builds a
+          tail; it piles mass against the ceiling and the distribution becomes <i>less</i> skewed. The blue
+          curve turns over; the uncapped one never does.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="takeaway"><span class="tk">Behaviour</span>
+    <p>Capping is the highest-leverage, lowest-cost decision in the model: near-zero effect on the estimate,
+      decisive effect on whether the estimate has usable error bars.</p></div>
+  <div class="brand">AI inference token TAM &middot; theory</div><div class="pnum">05</div>
+</section>
+
+<!-- ============ 6 · COUNTS ============ -->
+<section class="slide">
+  <p class="eyebrow"><span class="n">05</span> &nbsp;/&nbsp; Counts</p>
+  <h1 class="st wide">At national scale, sampling noise is not the uncertainty</h1>
+  <p class="lede">The adopting count is not a free input. Deriving it from an adoption probability shows where
+    the variance in this market genuinely comes from &mdash; and it is not the coin flips.</p>
+  <div class="rule"></div>
+  <div class="body cols c-58">
+    <div class="stack">
+      <div class="eqbox">
+        <span class="cap" style="margin:0 0 6px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:9.5px">Known adoption rate</span>
+        <span class="eq sm">N<sub>s</sub> ~ Bin(Pop<sub>s</sub>, p<sub>s</sub>) &nbsp;&#8658;&nbsp;
+          Var(N<sub>s</sub>) = Pop<sub>s</sub> p<sub>s</sub>(1 &minus; p<sub>s</sub>)</span>
+      </div>
+      <div class="eqbox key">
+        <span class="cap" style="margin:0 0 6px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:9.5px;color:var(--accent)">Uncertain adoption rate</span>
+        <span class="eq sm">p<sub>s</sub> ~ Beta(&#945;<sub>s</sub>, &#946;<sub>s</sub>) &nbsp;&#8658;&nbsp;
+          Var(N<sub>s</sub>) = Pop<sub>s</sub><span style="letter-spacing:.06em"> p&#772;</span><sub>s</sub>(1 &minus; <span>p&#772;</span><sub>s</sub>)
+          <span class="r">[</span>1 +
+          <span class="fr"><b>Pop<sub>s</sub> &minus; 1</b><i>&#945;<sub>s</sub> + &#946;<sub>s</sub> + 1</i></span>
+          <span class="r">]</span></span>
+        <span class="cap">The bracket grows with population, so the second term dominates:
+          Var(N) &#8594; Pop&sup2; &middot; Var(p)</span>
+      </div>
+      <p class="tx"><strong>The orders of magnitude decide it.</strong> The binomial term is
+        <span class="m">O</span>(Pop); the parameter-uncertainty term is <span class="m">O</span>(Pop&sup2;).
+        At Pop &#8776; 10<sup>8</sup> the second is roughly <b>10<sup>8</sup>&times;</b> the first. What we do
+        not know is the adoption <i>rate</i>, not the realisation of the individual draws.</p>
+      <p class="tx" style="margin-top:auto"><strong>The practical reading.</strong> A Beta prior on
+        <span class="m">p</span> is not a technical nicety layered on a binomial &mdash; at national scale it
+        <em class="k">is</em> the variance model, and the binomial underneath it is a rounding error.</p>
+    </div>
+    <div class="stack">
+      <p class="h3">The crossover, in the calibrated model</p>
+      <div class="kpi" style="grid-template-columns:1fr">
+        <div class="k a"><div class="lab">Enterprise count-uncertainty threshold</div>
+          <div class="val">CV(N) &gt; 0.46%</div>
+          <div class="sub">Above this, the count term alone exceeds the <i>entire</i> spend-dispersion
+            contribution to Var(TAM<sub class="m">e</sub>). Every credible adoption prior is far past it.</div></div>
+      </div>
+      <ul class="notes sm">
+        <li>At a 10% coefficient of variation on adoption, sd(TAM) rises from
+          <b>$0.11B to $3.02B</b> &mdash; a 27&times; widening driven entirely by parameter uncertainty.</li>
+        <li>This is why the deterministic-count approximation used in the convergence analysis must be
+          <i>checked</i>, never assumed. In this calibration it is not merely inaccurate; it is describing a
+          different regime (slide&nbsp;10).</li>
+        <li>The implementation takes E[N], Var(N) and &#956;<sub>3</sub>(N) as inputs, so any count model
+          &mdash; Binomial, Beta-Binomial, or a diffusion process supplying three moments &mdash; plugs in
+          unchanged.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="takeaway"><span class="tk">Behaviour</span>
+    <p>Var(TAM) is a statement about parameter uncertainty, not sampling error. More simulation draws will
+      never narrow it; a better adoption prior is the only thing that will.</p></div>
+  <div class="brand">AI inference token TAM &middot; theory</div><div class="pnum">06</div>
+</section>
+
+<!-- ============ 7 · COMPOUND MOMENTS ============ -->
+<section class="slide">
+  <p class="eyebrow"><span class="n">06</span> &nbsp;/&nbsp; The engine</p>
+  <h1 class="st wide">Wald, plus the third cumulant</h1>
+  <p class="lede">Cumulants of a compound sum compose &mdash;
+    <span class="m">K<sub>S</sub></span>(t) = <span class="m">K<sub>N</sub></span>(ln <span class="m">M<sub>X</sub></span>(t))
+    &mdash; so the third moment is exact rather than approximate. This is the whole computational engine.</p>
+  <div class="rule"></div>
+  <div class="body stack">
+    <div class="eqbox key" style="padding-top:18px;padding-bottom:18px">
+      <span class="eq">E[TAM<sub>s</sub>] = E[N<sub>s</sub>] E[X<sub>s</sub>]</span>
+      <span class="eq">Var(TAM<sub>s</sub>) = E[N<sub>s</sub>] Var(X<sub>s</sub>)
+        &nbsp;+&nbsp; (E[X<sub>s</sub>])&sup2; Var(N<sub>s</sub>)</span>
+      <span class="eq">&#956;<sub>3</sub>(TAM<sub>s</sub>) = E[N<sub>s</sub>] &#956;<sub>3</sub>(X<sub>s</sub>)
+        &nbsp;+&nbsp; 3 Var(N<sub>s</sub>) E[X<sub>s</sub>] Var(X<sub>s</sub>)
+        &nbsp;+&nbsp; &#956;<sub>3</sub>(N<sub>s</sub>) (E[X<sub>s</sub>])&sup3;</span>
+    </div>
+    <div class="cols c-2" style="gap:26px;align-items:start">
+      <div class="stack">
+        <p class="h3">Reading the structure</p>
+        <div class="termbar" style="flex-direction:column">
+          <div class="t"><b>Every term is one X-moment &times; one N-moment</b>
+            Spend and count never mix inside a term, which is what makes variance attribution exact and free
+            &mdash; no simulation needed to say which parameter owns which share.</div>
+          <div class="t"><b>The orders differ</b>
+            Spend terms scale as <span class="m">O</span>(E[N]); count terms as
+            <span class="m">O</span>(E[N]&sup2;) once Var(N) &#8733; Pop&sup2;. At national scale the second
+            group wins by construction, not by calibration.</div>
+          <div class="t"><b>Caps drop in without touching this layer</b>
+            Under a hard cap, substitute the truncated moments of X. Correlation, truncation and the count
+            model compose cleanly.</div>
+        </div>
+      </div>
+      <div class="stack">
+        <p class="h3">Where the calibrated mass sits</p>
+        <table>
+          <tr><th>Segment</th><th class="n">E[TAM]</th><th class="n">Share of Var</th><th class="n">Share of <span class="sym">&#956;<sub>3</sub></span></th></tr>
+          <tr><td><span class="sw c"></span>Consumer</td><td class="num">$17.9B</td><td class="num">0.1%</td><td class="num">&lt;0.01%</td></tr>
+          <tr><td><span class="sw e"></span>Enterprise</td><td class="num">$24.3B</td><td class="num">99.9%</td><td class="num">~100%</td></tr>
+          <tr class="tot"><td>Total</td><td class="num">$42.2B</td><td class="num">100%</td><td class="num">100%</td></tr>
+        </table>
+        <p class="tx mut" style="font-size:12.6px">Deterministic-count point calibration. The segments split the
+          <i>mean</i> almost evenly &mdash; 42 / 58 &mdash; and the <i>risk</i> not at all.</p>
+      </div>
+    </div>
+  </div>
+  <div class="takeaway"><span class="tk">Behaviour</span>
+    <p>Because each term factorises, the model answers "which parameter, in which segment, owns this much of
+      the uncertainty" in closed form. Every statement about uncertainty in this market is a statement about
+      enterprise spend.</p></div>
+  <div class="brand">AI inference token TAM &middot; theory</div><div class="pnum">07</div>
+</section>
+
+<!-- ============ 8 · AGGREGATION ============ -->
+<section class="slide">
+  <p class="eyebrow"><span class="n">07</span> &nbsp;/&nbsp; Aggregation</p>
+  <h1 class="st wide">The scale gap &#952;, and the covariance we know is missing</h1>
+  <p class="lede">Segment aggregation is additive in the first two moments. The interesting object is the ratio
+    between the segments &mdash; and it has two definitions, deliberately.</p>
+  <div class="rule"></div>
+  <div class="body cols c-58">
+    <div class="stack">
+      <div class="eqbox">
+        <span class="eq sm">E[TAM] = E[TAM<sub>i</sub>] + E[TAM<sub>e</sub>]</span>
+        <span class="eq sm">Var(TAM) = Var(TAM<sub>i</sub>) + Var(TAM<sub>e</sub>)
+          + 2 Cov(TAM<sub>i</sub>, TAM<sub>e</sub>)</span>
+      </div>
+      <p class="tx"><strong>The covariance term is carried, not dropped.</strong> The baseline sets it to zero,
+        but both segments respond to the same shocks &mdash; capability jumps, price moves, macro conditions.
+        So the sign of the bias is known: independence <em class="k">understates</em> total variance. A
+        known-sign, one-directional bias is the acceptable kind; a latent common factor slots straight into
+        this term without touching anything above it.</p>
+      <div class="eqbox key">
+        <span class="eq sm">&#952; = <span class="fr"><b>E[X<sub>e</sub>]</b><i>E[X<sub>i</sub>]</i></span>
+          = exp<span class="r">[</span>(&#956;<sub>X,e</sub> &minus; &#956;<sub>X,i</sub>) +
+          <span class="fr"><b>&#963;<sup>2</sup><sub style="margin-left:-.5em">X,e</sub> &minus; &#963;<sup>2</sup><sub style="margin-left:-.5em">X,i</sub></b><i>2</i></span>
+          <span class="r">]</span></span>
+      </div>
+    </div>
+    <div class="stack">
+      <p class="h3">Two <span class="sym">&#952;</span>'s, on purpose</p>
+      <div class="kpi" style="grid-template-columns:1fr 1fr">
+        <div class="k e"><div class="lab">Mean ratio <span class="sym">&#952;</span></div><div class="val">27.2</div>
+          <div class="sub">The economically meaningful scale gap. Carries &#963;<sub class="m">X,e</sub>.</div></div>
+        <div class="k"><div class="lab">Median ratio <span class="sym">&#952;<sub>med</sub></span></div><div class="val">4.9</div>
+          <div class="sub">&#963;-free. Exists only to keep one closed form from being circular.</div></div>
+      </div>
+      <ul class="notes sm">
+        <li><b>The wedge between them is the tail.</b> A typical enterprise account is about 5&times; a typical
+          consumer; the <i>average</i> enterprise account is 27&times;. The 5.5&times; gap between those two
+          statements is entirely enterprise dispersion.</li>
+        <li><b>&#952; is where the closed forms break.</b> Because &#952; contains
+          &#963;<sup>2</sup><sub class="m" style="margin-left:-.4em">X,e</sub>, any equation that solves for
+          &#963;<sub class="m">X,e</sub> with &#952; on the right-hand side is transcendental, not closed-form.
+          &#952;<sub>med</sub> is the honest workaround; the numeric solver is the answer (slide&nbsp;10).</li>
+        <li><b>Report both.</b> Quoting a mean ratio as if it described a typical account is the single easiest
+          way to mislead a client about this market.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="takeaway"><span class="tk">Behaviour</span>
+    <p>Mean and median diverge by construction under lognormality, and the divergence is a measurement of
+      concentration rather than a nuisance. The gap between &#952; and &#952;<sub class="m">med</sub> is the
+      cleanest single summary of how top-heavy enterprise demand is.</p></div>
+  <div class="brand">AI inference token TAM &middot; theory</div><div class="pnum">08</div>
+</section>
+
+<!-- ============ 9 · DIAGNOSTIC ============ -->
+<section class="slide">
+  <p class="eyebrow"><span class="n">08</span> &nbsp;/&nbsp; Diagnostic</p>
+  <h1 class="st wide">When is a normal confidence interval admissible?</h1>
+  <p class="lede">The convergence analysis does not estimate TAM &mdash; the simulation does. It answers a
+    narrower and more practical question: may I report &plusmn;1.96&#963;, or must I report simulated quantiles?</p>
+  <div class="rule"></div>
+  <div class="body cols c-2">
+    <div class="figwrap"><svg viewBox="0 0 600 330" role="img" aria-label="Critical enterprise dispersion grows like the square root of log accounts and never reaches the calibrated value">
+<line x1="52" y1="272.1" x2="448" y2="272.1" stroke="#e8edf2"/>
+<text x="43" y="276.6" text-anchor="end" fill="#5a6b7b" font-size="12.5">0.5</text>
+<line x1="52" y1="212.5" x2="448" y2="212.5" stroke="#e8edf2"/>
+<text x="43" y="217.0" text-anchor="end" fill="#5a6b7b" font-size="12.5">1.0</text>
+<line x1="52" y1="153.0" x2="448" y2="153.0" stroke="#e8edf2"/>
+<text x="43" y="157.5" text-anchor="end" fill="#5a6b7b" font-size="12.5">1.5</text>
+<line x1="52" y1="93.5" x2="448" y2="93.5" stroke="#e8edf2"/>
+<text x="43" y="98.0" text-anchor="end" fill="#5a6b7b" font-size="12.5">2.0</text>
+<line x1="52" y1="33.9" x2="448" y2="33.9" stroke="#e8edf2"/>
+<text x="43" y="38.4" text-anchor="end" fill="#5a6b7b" font-size="12.5">2.5</text>
+<text x="82.5" y="303" text-anchor="middle" fill="#5a6b7b" font-size="12.5">10<tspan font-size="9" dy="-5">3</tspan></text>
+<line x1="82.5" y1="284" x2="82.5" y2="288" stroke="#c9d2dc"/>
+<text x="204.3" y="303" text-anchor="middle" fill="#5a6b7b" font-size="12.5">10<tspan font-size="9" dy="-5">5</tspan></text>
+<line x1="204.3" y1="284" x2="204.3" y2="288" stroke="#c9d2dc"/>
+<text x="326.2" y="303" text-anchor="middle" fill="#5a6b7b" font-size="12.5">10<tspan font-size="9" dy="-5">7</tspan></text>
+<line x1="326.2" y1="284" x2="326.2" y2="288" stroke="#c9d2dc"/>
+<text x="448.0" y="303" text-anchor="middle" fill="#5a6b7b" font-size="12.5">10<tspan font-size="9" dy="-5">9</tspan></text>
+<line x1="448.0" y1="284" x2="448.0" y2="288" stroke="#c9d2dc"/>
+<polyline points="52.0,257.9 54.2,255.2 56.4,252.7 58.6,250.2 60.8,247.8 63.1,245.5 65.3,243.2 67.5,241.0 69.7,238.9 71.9,236.8 74.1,234.7 76.3,232.7 78.5,230.7 80.8,228.8 83.0,226.9 85.2,225.0 87.4,223.2 89.6,221.4 91.8,219.6 94.0,217.8 96.2,216.1 98.5,214.4 100.7,212.7 102.9,211.1 105.1,209.4 107.3,207.8 109.5,206.3 111.7,204.7 113.9,203.1 116.2,201.6 118.4,200.1 120.6,198.6 122.8,197.1 125.0,195.7 127.2,194.2 129.4,192.8 131.6,191.4 133.9,190.0 136.1,188.6 138.3,187.2 140.5,185.8 142.7,184.5 144.9,183.2 147.1,181.8 149.3,180.5 151.6,179.2 153.8,177.9 156.0,176.6 158.2,175.4 160.4,174.1 162.6,172.9 164.8,171.6 167.0,170.4 169.3,169.2 171.5,168.0 173.7,166.8 175.9,165.6 178.1,164.4 180.3,163.2 182.5,162.0 184.7,160.9 186.9,159.7 189.2,158.6 191.4,157.4 193.6,156.3 195.8,155.2 198.0,154.1 200.2,153.0 202.4,151.9 204.6,150.8 206.9,149.7 209.1,148.6 211.3,147.5 213.5,146.4 215.7,145.4 217.9,144.3 220.1,143.3 222.3,142.2 224.6,141.2 226.8,140.1 229.0,139.1 231.2,138.1 233.4,137.1 235.6,136.1 237.8,135.0 240.0,134.0 242.3,133.0 244.5,132.1 246.7,131.1 248.9,130.1 251.1,129.1 253.3,128.1 255.5,127.2 257.7,126.2 260.0,125.2 262.2,124.3 264.4,123.3 266.6,122.4 268.8,121.4 271.0,120.5 273.2,119.6 275.4,118.6 277.7,117.7 279.9,116.8 282.1,115.9 284.3,115.0 286.5,114.1 288.7,113.1 290.9,112.2 293.1,111.3 295.4,110.4 297.6,109.6 299.8,108.7 302.0,107.8 304.2,106.9 306.4,106.0 308.6,105.2 310.8,104.3 313.1,103.4 315.3,102.5 317.5,101.7 319.7,100.8 321.9,100.0 324.1,99.1 326.3,98.3 328.5,97.4 330.7,96.6 333.0,95.7 335.2,94.9 337.4,94.1 339.6,93.2 341.8,92.4 344.0,91.6 346.2,90.8 348.4,90.0 350.7,89.1 352.9,88.3 355.1,87.5 357.3,86.7 359.5,85.9 361.7,85.1 363.9,84.3 366.1,83.5 368.4,82.7 370.6,81.9 372.8,81.1 375.0,80.3 377.2,79.5 379.4,78.8 381.6,78.0 383.8,77.2 386.1,76.4 388.3,75.7 390.5,74.9 392.7,74.1 394.9,73.3 397.1,72.6 399.3,71.8 401.5,71.1 403.8,70.3 406.0,69.6 408.2,68.8 410.4,68.0 412.6,67.3 414.8,66.6 417.0,65.8 419.2,65.1 421.5,64.3 423.7,63.6 425.9,62.8 428.1,62.1 430.3,61.4 432.5,60.7 434.7,59.9 436.9,59.2 439.2,58.5 441.4,57.8 443.6,57.0 445.8,56.3 448.0,55.6" fill="none" stroke="#b06f23" stroke-width="2.4"/>
+<text x="457" y="53.1" fill="#b06f23" font-size="13" font-weight="650">&#963;<tspan font-size="9.5" dy="2">crit</tspan><tspan dy="-2"> at &#949;=0.1</tspan></text>
+<line x1="52" y1="74.0" x2="448" y2="74.0" stroke="#16212e" stroke-width="1.3" stroke-dasharray="5 4"/>
+<text x="457" y="78.5" fill="#16212e" font-size="12.5">calibrated &#963;<tspan font-size="9.5" dy="2">X,e</tspan><tspan dy="-2">=2.16</tspan></text>
+<text x="457" y="94.0" fill="#5a6b7b" font-size="11.5">the curve never reaches it</text>
+<circle cx="307.8" cy="105.5" r="5.5" fill="#b06f23" stroke="#fff" stroke-width="2"><title>E[N_e]=5M accounts, sigma_crit=1.899</title></circle>
+<text x="309.8" y="126.5" text-anchor="middle" fill="#16212e" font-size="12.5" font-weight="650">1.90 at 5M accounts</text>
+<line x1="52" y1="284" x2="448" y2="284" stroke="#c9d2dc"/><line x1="52" y1="22" x2="52" y2="284" stroke="#c9d2dc"/>
+<text x="250" y="324" text-anchor="middle" fill="#5a6b7b" font-size="12">enterprise accounts E[N<tspan font-size="9.5" dy="2">e</tspan><tspan dy="-2">], log scale</tspan></text>
+<text transform="translate(14,153) rotate(-90)" text-anchor="middle" fill="#5a6b7b" font-size="12">critical dispersion &#963;<tspan font-size="9.5" dy="2">crit</tspan></text>
+</svg>
+      <p class="figcap">Enterprise-dominated regime, &#949; = 0.1. The threshold rises logarithmically;
+        the calibrated dispersion sits above it at every plausible market size.</p>
+    </div>
+    <div class="stack">
+      <div class="eqbox key">
+        <span class="eq sm">&#947;<sub>TAM</sub> =
+          <span class="fr"><b>&#956;<sub>3</sub>(TAM<sub>i</sub>) + &#956;<sub>3</sub>(TAM<sub>e</sub>)</b><i>(Var(TAM<sub>i</sub>) + Var(TAM<sub>e</sub>))<sup>3/2</sup></i></span>
+          &nbsp;&#8804;&nbsp; &#949;</span>
+        <span class="cap">Exact, from the compound moments of slide 7</span>
+      </div>
+      <div class="eqbox">
+        <span class="eq sm">&#947; &#8776;
+          e<sup>(3/2)&#963;&sup2;<sub style="margin-left:-.4em">X,e</sub></sup> /
+          <span class="rt"><u>&#8730;</u><s>E[N<sub>e</sub>]</s></span>
+          &nbsp;&#8658;&nbsp; &#963;<sub>X,e(crit)</sub> =
+          <span class="rt big"><u>&#8730;</u><s>&nbsp;ln(&#949;&sup2; E[N<sub>e</sub>]) / 3&nbsp;</s></span></span>
+        <span class="cap">Real only when &#949;&sup2; E[N<sub>e</sub>] &gt; 1</span>
+      </div>
+      <ul class="notes sm">
+        <li><b>It grows like <span class="m">&#8730;log N</span>.</b> Six orders of magnitude in market size
+          &mdash; 10<sup>3</sup> to 10<sup>9</sup> accounts &mdash; moves the threshold only from
+          <b>0.88 to 2.32</b>. Loosening &#949; fourfold, from 0.05 to 0.20, buys just 1.77 to 2.02. Against a
+          heavy tail the central limit theorem arrives logarithmically slowly.</li>
+        <li><b>The verdict here.</b> &#963;<sub class="m">X,e</sub> = <b>2.163</b> sits above
+          &#963;<sub class="m">crit</sub> = <b>1.899</b>, giving &#947; = <b>0.51</b>, five times tolerance.
+          Analytical intervals are inadmissible; report simulated quantiles.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="takeaway"><span class="tk">Behaviour</span>
+    <p>The threshold moves like the square root of a logarithm while the skewness it is fighting moves like
+      e<sup>3&#963;&sup2;/2</sup>. Concentration, not market size, decides whether this market is analytically
+      predictable &mdash; and the value of the diagnostic is precisely that it can fail. A check that always
+      passes says nothing about when to trust your own error bars.</p></div>
+  <div class="brand">AI inference token TAM &middot; theory</div><div class="pnum">09</div>
+</section>
+
+<!-- ============ 10 · REGIMES ============ -->
+<section class="slide">
+  <p class="eyebrow"><span class="n">09</span> &nbsp;/&nbsp; Regimes</p>
+  <h1 class="st wide">Three regimes &mdash; and the discipline of knowing which one you are in</h1>
+  <p class="lede">Each closed form below is correct inside its own envelope and badly wrong outside it. The
+    envelopes are checkable, which is what makes the approximations usable at all.</p>
+  <div class="rule"></div>
+  <div class="body stack">
+    <div class="cols c-3" style="height:auto;gap:16px">
+      <div class="card e" style="display:flex;flex-direction:column;gap:8px">
+        <p class="ct">A &middot; Enterprise-dominated</p>
+        <p class="cb" style="font-size:12px">Holds when
+          E[N<sub class="m">e</sub>]e<sup>&#963;&sup2;<sub style="margin-left:-.4em">X,e</sub></sup>&#952;&sup2;
+          &#8811; E[N<sub class="m">i</sub>](e<sup>&#963;&sup2;<sub style="margin-left:-.4em">X,i</sub></sup>&minus;1).</p>
+        <div class="eqbox" style="padding:10px"><span class="eq" style="font-size:14px">&#963;<sub>crit</sub> =
+          <span class="rt"><u>&#8730;</u><s>ln(&#949;&sup2;E[N<sub>e</sub>])/3</s></span></span></div>
+        <p class="cb" style="font-size:12px"><b style="color:var(--ink)">Here: this is the regime.</b> The
+          closed form returns <b style="color:var(--ink)">1.899</b> against the exact numeric solution
+          <b style="color:var(--ink)">1.894</b> &mdash; agreement to 0.3%.</p>
+        <p class="cb" style="font-size:12px;margin-top:auto">Note what the threshold does <i>not</i> contain:
+          no &#952;, no consumer parameter, no &#956;. In this regime the entire question reduces to enterprise
+          dispersion against enterprise account count.</p>
+      </div>
+      <div class="card c" style="display:flex;flex-direction:column;gap:8px">
+        <p class="ct">B &middot; Consumer-anchored</p>
+        <p class="cb" style="font-size:12px">The mirror condition, with the consumer variance in the
+          denominator.</p>
+        <div class="eqbox" style="padding:10px"><span class="eq" style="font-size:13px">&#963;<sub>crit</sub> =
+          <span class="rt big"><u>&#8730;</u><s>&nbsp;ln<span class="r">(</span><span class="fr" style="font-size:.85em"><b>&#949;&sup2;E[N<sub>i</sub>]&sup3;(e<sup>&#963;&sup2;<sub style="margin-left:-.4em">X,i</sub></sup>&minus;1)&sup3;</b><i>E[N<sub>e</sub>]&sup2; &#952;<sub>med</sub><sup>6</sup></i></span><span class="r">)</span>/6&nbsp;</s></span></span></div>
+        <p class="cb" style="font-size:12px"><b style="color:var(--ink)">The &#952;<sub>med</sub><sup>6</sup>
+          denominator is decisive.</b> For &#952; &#8819; 10&sup2; the log-argument falls below 1 and no real
+          root exists. A domain failure is the formula telling you to use Regime A.</p>
+      </div>
+      <div class="card a" style="display:flex;flex-direction:column;gap:8px">
+        <p class="ct">C &middot; Count-dominated</p>
+        <p class="cb" style="font-size:12px">The regime both approximations discard &mdash; and the one the
+          calibration is actually in, once adoption uncertainty is admitted (slide&nbsp;6).</p>
+        <div class="eqbox key" style="padding:10px"><span class="eq" style="font-size:14px">&#947;<sub>TAM</sub>
+          &#8594; &#947;<sub>p</sub> &middot; H,&nbsp;&nbsp; H =
+          <span class="fr" style="font-size:.85em"><b>&#8721;<sub>s</sub> TAM<sub>s</sub>&sup3;</b><i>(&#8721;<sub>s</sub> TAM<sub>s</sub>&sup2;)<sup>3/2</sup></i></span></span></div>
+        <p class="cb" style="font-size:12px">The spend tail <b style="color:var(--ink)">cancels out of
+          &#947; entirely</b>. Aggregate skewness is inherited from the adoption prior, scaled by a pure
+          segment-share factor H &#8712; [1/&#8730;2, 1]. Here H = <b style="color:var(--ink)">0.731</b>,
+          matching the exact moments to four digits.</p>
+      </div>
+    </div>
+    <div class="cols c-2" style="height:auto;gap:26px;margin-top:14px">
+      <div>
+        <p class="h3">The transcendental problem</p>
+        <p class="tx" style="font-size:12.8px">&#952; contains &#963;<sub class="m">X,e</sub>, so solving for
+          &#963;<sub class="m">crit</sub> with &#952; on the right-hand side is a transcendental equation
+          wearing the clothes of a closed form. Either substitute the &#963;-free
+          &#952;<sub class="m">med</sub>, or <em class="k">root-find on the exact &#947;</em> &mdash; Brent's
+          method, regime-free, cap- and &#961;-aware, hitting &#947; = &#949; to ~10<sup>&minus;9</sup>.</p>
+      </div>
+      <div>
+        <p class="h3">Why keep the closed forms at all</p>
+        <p class="tx" style="font-size:12.8px">Because the solver returns a number and the algebra returns a
+          reason. &#963;<sub class="m">crit</sub> &#8733; &#8730;log N is visible in one line and invisible in
+          any amount of output. The closed forms say <em class="k">which lever matters</em>; the solver says
+          <em class="k">what the answer is</em>. Reporting the first as the second is the error this
+          derivation is built to catch.</p>
+      </div>
+    </div>
+  </div>
+  <div class="takeaway"><span class="tk">Behaviour</span>
+    <p>The model has a regime structure, and the regime &mdash; not the parameter values &mdash; determines
+      which formula is even meaningful. Checking the envelope before quoting a result is the whole
+      methodological point.</p></div>
+  <div class="brand">AI inference token TAM &middot; theory</div><div class="pnum">10</div>
+</section>
+
+<!-- ============ APPENDIX DIVIDER ============ -->
+<section class="slide divider">
+  <div class="lbl">Appendix</div>
+  <h1>Supporting derivations,<br>corrections, and calibration</h1>
+  <p>Truncated-moment algebra and the count-dominated limit &middot; errors the re-derivation caught &middot;
+    the calibration snapshot and the validation contract &middot; notation.</p>
+  <div class="brand">AI inference token TAM &middot; theory</div><div class="pnum">A</div>
+</section>
+
+<!-- ============ A1 ============ -->
+<section class="slide">
+  <p class="eyebrow"><span class="n">A1</span> &nbsp;/&nbsp; Derivations</p>
+  <h1 class="st wide">Two results quoted without proof in the main deck</h1>
+  <div class="rule"></div>
+  <div class="body cols c-2">
+    <div class="stack">
+      <p class="h3">Truncated central moments</p>
+      <p class="tx">Raw moments under an upper truncation at <span class="m">c</span> follow from completing
+        the square in the lognormal integral, giving the ratio of normal CDFs on slide&nbsp;5. Central moments
+        then follow mechanically:</p>
+      <div class="eqbox">
+        <span class="eq sm">Var = m<sub>2</sub> &minus; m<sub>1</sub><sup>2</sup></span>
+        <span class="eq sm">&#956;<sub>3</sub> = m<sub>3</sub> &minus; 3m<sub>1</sub>m<sub>2</sub>
+          + 2m<sub>1</sub><sup>3</sup></span>
+      </div>
+      <p class="tx mut" style="font-size:12.8px">Both are validated against numerical quadrature to a relative
+        error of about 10<sup>&minus;11</sup>, and the compound-sum moments against brute-force simulation.</p>
+      <p class="h3" style="margin-top:2px">Feasibility bound on the root search</p>
+      <p class="tx" style="font-size:13.2px">With &#963;<sub class="m">K</sub> &#8805; 0, the smallest attainable dispersion is
+        &#963;<sub class="m">I</sub><span class="rt"><u>&#8730;</u><s>1&minus;&#961;&sup2;</s></span> for
+        &#961; &lt; 0, and &#963;<sub class="m">I</sub> otherwise. That bound is what brackets the numeric
+        solver from below &mdash; without it the root-find can wander into parameterisations the model cannot
+        represent.</p>
+    </div>
+    <div class="stack">
+      <p class="h3">The count-dominated limit</p>
+      <p class="tx">When Var(N) dominates, each segment total is approximately
+        <span class="m">TAM<sub>s</sub> &#8776; E[X<sub>s</sub>] N<sub>s</sub></span> &mdash; a deterministic
+        rescaling of the count. If both segments inherit the same adoption-prior skewness
+        <span class="m">&#947;<sub>p</sub></span> and coefficient of variation, the
+        <span class="m">E[X<sub>s</sub>]</span> and CV factors cancel between numerator and denominator:</p>
+      <div class="eqbox key">
+        <span class="eq sm">&#947;<sub>TAM</sub> &#8594; &#947;<sub>p</sub> &middot;
+          <span class="fr"><b>&#8721;<sub>s</sub> a<sub>s</sub>&sup3;</b><i>(&#8721;<sub>s</sub> a<sub>s</sub>&sup2;)<sup>3/2</sup></i></span>,
+          &nbsp;&nbsp; a<sub>s</sub> = E[TAM<sub>s</sub>]</span>
+      </div>
+      <p class="tx">The factor is a concentration index on segment shares: it equals
+        <span class="m">1/&#8730;2 &#8776; 0.707</span> for two equal segments and approaches 1 as one segment
+        takes over. At the current 42 / 58 split it is <b>0.731</b>.</p>
+      <table style="margin-top:2px">
+        <tr><th>Adoption-prior skew <span class="sym">&#947;<sub>p</sub></span></th><th class="n">Exact <span class="sym">&#947;<sub>TAM</sub></span></th><th class="n"><span class="sym">H &middot; &#947;<sub>p</sub></span></th></tr>
+        <tr><td>0.5</td><td class="num">0.3650</td><td class="num">0.3654</td></tr>
+        <tr><td>1.0</td><td class="num">0.7296</td><td class="num">0.7307</td></tr>
+        <tr class="tot"><td>2.0</td><td class="num">1.4588</td><td class="num">1.4615</td></tr>
+      </table>
+      <p class="tx mut" style="font-size:12.4px">Evaluated at CV(N) = 10%. The limit is approached from below and
+        is essentially exact by the time adoption uncertainty is realistic.</p>
+    </div>
+  </div>
+  <div class="brand">AI inference token TAM &middot; theory</div><div class="pnum">A1</div>
+</section>
+
+<!-- ============ A2 ============ -->
+<section class="slide">
+  <p class="eyebrow"><span class="n">A2</span> &nbsp;/&nbsp; Corrections</p>
+  <h1 class="st wide">What re-deriving the framework actually caught</h1>
+  <p class="lede">Three errors survived into a prior version of this framework. Each was found by checking the
+    algebra against the code, not by inspection &mdash; which is the argument for keeping both.</p>
+  <div class="rule"></div>
+  <div class="body stack" style="gap:14px">
+    <div class="card" style="border-left:3px solid var(--enterprise)">
+      <p class="ct">1 &middot; A dimensional error in the consumer-anchored threshold</p>
+      <p class="cb">The earlier form read <span class="m">&#189; ln(&middot;)</span> with no outer square root:
+        wrong coefficient (&#189; rather than <span class="m">&#8537;</span>) and wrong dimension &mdash; it
+        returns a &#963;&sup2;-like quantity while being labelled &#963;. In a test regime where both forms
+        produce a number, the old one overstates &#963;<sub class="m">crit</sub> by roughly
+        <b style="color:var(--ink)">7&times;</b>, which would license normal confidence intervals in a regime
+        that badly fails them. A units check on the output would have caught it before any numerical test did.</p>
+    </div>
+    <div class="card" style="border-left:3px solid var(--consumer)">
+      <p class="ct">2 &middot; A dropped factor in the regime condition</p>
+      <p class="cb">The enterprise-dominance condition was stated as
+        <span class="m">E[N<sub>e</sub>]&#952;&sup2; &#8811; E[N<sub>i</sub>]e<sup>&#963;&sup2;<sub style="margin-left:-.4em">X,i</sub></sup></span>,
+        omitting the <span class="m">e<sup>&#963;&sup2;<sub style="margin-left:-.4em">X,e</sub></sup></span>
+        factor. That factor is negligible in the benign case and dominant in the high-concentration case
+        &mdash; that is, it matters precisely in the regime the analysis exists to study.</p>
+    </div>
+    <div class="card" style="border-left:3px solid var(--accent)">
+      <p class="ct">3 &middot; A "closed form" that was transcendental</p>
+      <p class="cb">Because &#952; carries &#963;<sub class="m">X,e</sub>, solving for
+        &#963;<sub class="m">crit</sub> with &#952; on the right-hand side is not a closed form. The fix is
+        stated rather than hidden: use the &#963;-free &#952;<sub class="m">med</sub> and accept the
+        reinterpretation, or root-find on the exact expression. Both are implemented; the second is the one
+        that gets reported.</p>
+    </div>
+    <div class="card wash">
+      <p class="cb"><b style="color:var(--ink)">The pattern.</b> None of these change the headline TAM. All
+        three change whether the reported uncertainty around it is defensible &mdash; which is the part a
+        client, a journalist, or a referee will actually lean on.</p>
+    </div>
+  </div>
+  <div class="brand">AI inference token TAM &middot; theory</div><div class="pnum">A2</div>
+</section>
+
+<!-- ============ A3 ============ -->
+<section class="slide">
+  <p class="eyebrow"><span class="n">A3</span> &nbsp;/&nbsp; Calibration &amp; validation</p>
+  <h1 class="st wide">The inputs, and the contract every layer must satisfy</h1>
+  <div class="rule"></div>
+  <div class="body cols c-58">
+    <div class="stack">
+      <p class="h3">Calibration snapshot (medians in parentheses)</p>
+      <table>
+        <tr><th>Segment</th><th class="n">N</th><th class="n"><span class="sym">&#956;<sub>I</sub></span></th><th class="n"><span class="sym">&#963;<sub>I</sub></span></th><th class="n"><span class="sym">&#956;<sub>K</sub></span></th><th class="n"><span class="sym">&#963;<sub>K</sub></span></th></tr>
+        <tr><td><span class="sw c"></span>Consumer</td><td class="num">100M</td>
+          <td class="num">10.609<br><span style="color:var(--faint);font-size:10.5px">($40,481)</span></td>
+          <td class="num">0.876</td>
+          <td class="num">&minus;6.05<br><span style="color:var(--faint);font-size:10.5px">(0.24%)</span></td>
+          <td class="num">0.70</td></tr>
+        <tr class="tot"><td><span class="sw e"></span>Enterprise</td><td class="num">5M</td>
+          <td class="num">12.000<br><span style="color:var(--faint);font-size:10.5px">($162,755)</span></td>
+          <td class="num">1.80</td>
+          <td class="num">&minus;5.85<br><span style="color:var(--faint);font-size:10.5px">(0.29%)</span></td>
+          <td class="num">1.20</td></tr>
+      </table>
+      <p class="tx mut" style="font-size:12.6px">Penetration medians are close across segments; the scale gap
+        comes almost entirely from the IT-budget base and the heavier enterprise dispersion
+        &#963;<sub class="m">K,e</sub>. Sensitivity analysis attributes roughly 95% of TAM variance to three
+        enterprise levers.</p>
+      <div style="margin-top:auto">
+        <p class="h3">Those three levers, at the ranges carried through the model</p>
+        <table>
+          <tr><th>Lever</th><th class="n">Parameter</th><th class="n">Low</th><th class="n">Base</th><th class="n">High</th></tr>
+          <tr><td>Enterprise AI adoption</td><td class="num"><span class="m">&#956;<sub>K,e</sub></span></td>
+            <td class="num">&minus;6.30</td><td class="num">&minus;5.85</td><td class="num">&minus;5.30</td></tr>
+          <tr><td>Spend concentration</td><td class="num"><span class="m">&#963;<sub>K,e</sub></span></td>
+            <td class="num">0.85</td><td class="num">1.20</td><td class="num">1.50</td></tr>
+          <tr class="tot"><td>Enterprise scale</td><td class="num"><span class="m">&#956;<sub>I,e</sub></span></td>
+            <td class="num">11.60</td><td class="num">12.00</td><td class="num">12.90</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="stack">
+      <p class="h3">Theory &#8594; code &#8594; test</p>
+      <table>
+        <tr><th>Result</th><th>Validated against</th></tr>
+        <tr><td>Lognormal moments with &#961;</td><td>Quadrature, rel. err ~10<sup>&minus;11</sup>; brute MC for &#961; &#8800; 0</td></tr>
+        <tr><td>Truncated moments</td><td>Quadrature, rel. err ~10<sup>&minus;11</sup></td></tr>
+        <tr><td>Compound-sum moments</td><td>Brute-force MC, 200k replications</td></tr>
+        <tr><td>Whole-market aggregates</td><td>Two-segment brute MC, 300k replications</td></tr>
+        <tr><td>Regime A / B thresholds</td><td>Self-consistency to machine precision; domain checks</td></tr>
+        <tr class="tot"><td>Numeric &#963;<sub class="m">crit</sub> solver</td><td>Hits &#947; = &#949; to ~10<sup>&minus;9</sup></td></tr>
+      </table>
+      <div class="card a"><p class="cb"><b style="color:var(--ink)">The contract.</b> The simulation's
+        E[TAM], Var(TAM) and &#947;<sub class="m">TAM</sub> must match these closed forms within Monte Carlo
+        standard error before any downstream result &mdash; quantiles, sensitivity indices, figures &mdash; is
+        trusted. The analytical layer exists to make the simulation falsifiable.</p></div>
+    </div>
+  </div>
+  <div class="takeaway"><span class="tk">Open</span>
+    <p>Known limits, in order of how much they would move the answer: enterprise tail shape (a Pareto splice
+      with &#945; &#8804; 3 has no finite third moment and would invalidate the diagnostic outright, itself a
+      useful signal); cross-segment covariance; adopter selection at partial penetration; price endogeneity.</p></div>
+  <div class="brand">AI inference token TAM &middot; theory</div><div class="pnum">A3</div>
+</section>
+
+<!-- ============ A4 ============ -->
+<section class="slide">
+  <p class="eyebrow"><span class="n">A4</span> &nbsp;/&nbsp; Notation</p>
+  <h1 class="st wide">Symbols used in this deck</h1>
+  <div class="rule"></div>
+  <div class="body cols c-2">
+    <table style="align-self:center">
+      <tr><th>Symbol</th><th>Meaning</th></tr>
+      <tr><td class="m">Pop<sub>s</sub></td><td>Eligible population: US adults, or US firms</td></tr>
+      <tr><td class="m">N<sub>s</sub></td><td>Adopting unit count in segment <span class="m">s &#8712; {i, e}</span></td></tr>
+      <tr><td class="m">X<sub>s</sub></td><td>Annual USD spend per adopting unit</td></tr>
+      <tr><td class="m">I<sub>s</sub></td><td>Income (consumers) or IT-budget scale (firms)</td></tr>
+      <tr><td class="m">K<sub>s</sub></td><td>Token-penetration rate: share of <span class="m">I</span> spent on inference</td></tr>
+      <tr><td class="m">&#956;<sub>X</sub>, &#963;<sub>X</sub></td><td>Log-mean and log-sd of unit spend</td></tr>
+      <tr><td class="m">&#961;<sub>s</sub></td><td>Correlation of ln <span class="m">I</span> and ln <span class="m">K</span> within a segment</td></tr>
+      <tr class="tot"><td class="m">&#956;<sub>3</sub></td><td>Third central moment; skewness numerator</td></tr>
+    </table>
+    <table style="align-self:center">
+      <tr><th>Symbol</th><th>Meaning</th></tr>
+      <tr><td class="m">c</td><td>Hard upper cap on unit spend (truncation point)</td></tr>
+      <tr><td class="m">p<sub>s</sub></td><td>Equilibrium adoption probability; Beta-distributed when uncertain</td></tr>
+      <tr><td class="m">&#945;, &#946;</td><td>Beta-prior parameters governing adoption-rate uncertainty</td></tr>
+      <tr><td class="m">&#952;, &#952;<sub>med</sub></td><td>Enterprise-to-consumer spend ratio, at the mean and at the median</td></tr>
+      <tr><td class="m">&#947;</td><td>Skewness, <span class="m">&#956;<sub>3</sub> / Var<sup>3/2</sup></span></td></tr>
+      <tr><td class="m">&#949;</td><td>Skewness tolerance for admitting a normal approximation</td></tr>
+      <tr><td class="m">&#963;<sub>X,e(crit)</sub></td><td>Enterprise dispersion at which <span class="m">&#947; = &#949;</span></td></tr>
+      <tr class="tot"><td class="m">H</td><td>Segment-share concentration factor in the count-dominated limit</td></tr>
+    </table>
+  </div>
+  <div class="takeaway"><span class="tk">Conventions</span>
+    <p>All figures are annual US dollars at stable prices. Subscript <span class="m">i</span> denotes the
+      consumer segment, <span class="m">e</span> the enterprise segment. Numbers shown throughout are computed
+      from the calibration in A3 using the same closed forms described in the deck.</p></div>
+  <div class="brand">AI inference token TAM &middot; theory</div><div class="pnum">A4</div>
+</section>
+
+</div></div>
+
+<nav id="nav">
+  <button id="prev" title="Previous (&larr;)">&#8249;</button>
+  <span class="ctr"><span id="cur">1</span>&thinsp;/&thinsp;<span id="tot">1</span></span>
+  <button id="next" title="Next (&rarr;)">&#8250;</button>
+  <span class="hint">&larr; &rarr; &nbsp;navigate &nbsp;&middot;&nbsp; P&nbsp;print</span>
+</nav>
+
+<script>
+(function(){
+  var slides=[].slice.call(document.querySelectorAll('.slide'));
+  var stage=document.getElementById('stage'), vp=document.getElementById('viewport');
+  var cur=0;
+  document.getElementById('tot').textContent=slides.length;
+
+  function show(i){
+    cur=Math.max(0,Math.min(slides.length-1,i));
+    slides.forEach(function(s,k){s.classList.toggle('on',k===cur)});
+    document.getElementById('cur').textContent=cur+1;
+    document.getElementById('prog').style.width=((cur+1)/slides.length*100)+'%';
+    if(location.hash!=='#'+(cur+1)) history.replaceState(null,'','#'+(cur+1));
+  }
+  function fit(){
+    var s=Math.min(vp.clientWidth/1280,vp.clientHeight/720)*0.965;
+    stage.style.transform='scale('+s+')';
+  }
+  window.addEventListener('resize',fit); fit();
+
+  document.getElementById('next').onclick=function(){show(cur+1)};
+  document.getElementById('prev').onclick=function(){show(cur-1)};
+  document.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){show(cur+1);e.preventDefault()}
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){show(cur-1);e.preventDefault()}
+    else if(e.key==='Home'){show(0)} else if(e.key==='End'){show(slides.length-1)}
+    else if(e.key==='p'||e.key==='P'){window.print()}
+  });
+  vp.addEventListener('click',function(e){
+    if(e.target.closest('#nav'))return;
+    show(cur + (e.clientX > window.innerWidth*0.5 ? 1 : -1));
+  });
+  var start=parseInt((location.hash||'#1').slice(1),10);
+  show(isNaN(start)?0:start-1);
+})();
+</script>
+</body>
+</html>
