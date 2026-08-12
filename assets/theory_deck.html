@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="color-scheme" content="light" />
-<title>AI Inference Token TAM — Theory Deck</title>
+<title>AI Inference Token TAM: Theory Deck</title>
 <style>
 :root{
   --paper:#ffffff; --ink:#16212e; --mute:#5a6b7b; --faint:#8794a2;
@@ -202,7 +202,7 @@ h1.big{font-size:52px;line-height:1.06;letter-spacing:-.028em;font-weight:660;ma
   <div class="title-inner">
     <p class="eyebrow" style="margin-bottom:18px">Theory note &middot; US AI inference tokens</p>
     <h1 class="big">Sizing a market<br>that doesn't exist yet</h1>
-    <p class="title-sub">A closed-form structural framework for US inference-token expenditure &mdash;
+    <p class="title-sub">A closed-form structural framework for US inference-token expenditure,
       and what its solutions predict about the shape of the answer before any data is loaded.</p>
     <div class="title-meta">
       <div><div class="l">Estimand</div><div class="v">Annual US spend on LLM<br>inference tokens, USD</div></div>
@@ -211,7 +211,7 @@ h1.big{font-size:52px;line-height:1.06;letter-spacing:-.028em;font-weight:660;ma
       <div><div class="l">Companion to</div><div class="v">The calibrated Monte Carlo<br>engine and dashboard</div></div>
     </div>
   </div>
-  <div class="brand">Theory layer &mdash; derivations, comparative statics, and diagnostics</div>
+  <div class="brand">Theory layer: derivations, comparative statics, and diagnostics</div>
   <div class="pnum">01</div>
 </section>
 
@@ -235,7 +235,7 @@ h1.big{font-size:52px;line-height:1.06;letter-spacing:-.028em;font-weight:660;ma
       </div>
       <p class="tx"><strong>Why a compound sum.</strong> Two independent sources of ignorance sit in this market:
         how many buyers there will be, and how much each spends. A point estimate multiplies two guesses and
-        discards both error terms. A compound sum propagates them &mdash; and their interaction is exactly
+        discards both error terms. A compound sum propagates them, and their interaction is exactly
         what the third moment picks up.</p>
       <p class="tx"><strong>Why bifurcate.</strong> No single distribution holds a
         <span class="hl-c">$179</span> consumer mean and a <span class="hl-e">$4,866</span> enterprise mean
@@ -250,7 +250,7 @@ h1.big{font-size:52px;line-height:1.06;letter-spacing:-.028em;font-weight:660;ma
             <span class="cav">Spends are exchangeable given the segment. Heterogeneity lives in the
             lognormal, not across units.</span></div></div>
           <div class="arow"><div class="tag">A2</div><div class="txt"><b>Counts &#8869; spends.</b>
-            <span class="cav">Violated at partial penetration &mdash; early adopters skew high-income.
+            <span class="cav">Violated at partial penetration; early adopters skew high-income.
             Approximately holds at the saturation equilibrium being priced.</span></div></div>
           <div class="arow"><div class="tag">A3</div><div class="txt"><b>Segments independent.</b>
             <span class="cav">Common shocks make this false and the direction is known: independence
@@ -297,8 +297,8 @@ h1.big{font-size:52px;line-height:1.06;letter-spacing:-.028em;font-weight:660;ma
     </div>
   </div>
   <div class="takeaway"><span class="tk">Behaviour</span>
-    <p>The mean of this object is easy and almost uninformative. Everything decision-relevant &mdash; tail risk,
-      whether error bars are legal, which parameter to spend calibration effort on &mdash; lives in the second
+    <p>The mean of this object is easy and almost uninformative. Everything decision-relevant (tail risk,
+      whether error bars are legal, which parameter to spend calibration effort on) lives in the second
       and third moments, which is what the rest of the framework solves for.</p></div>
   <div class="brand">AI inference token TAM &middot; theory</div><div class="pnum">02</div>
 </section>
@@ -317,10 +317,10 @@ h1.big{font-size:52px;line-height:1.06;letter-spacing:-.028em;font-weight:660;ma
           &nbsp;&nbsp;&nbsp;&nbsp; X<sub>e</sub> = K<sub>e</sub> &middot; I<sub>e</sub></span>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div class="card c"><p class="ct"><span class="m">I</span> &mdash; the base</p>
+        <div class="card c"><p class="ct"><span class="m">I</span>: the base</p>
           <p class="cb">Personal income for consumers; IT-budget / firm scale for enterprises.
             Externally observable, externally calibrated. Carries no opinion about AI.</p></div>
-        <div class="card e"><p class="ct"><span class="m">K</span> &mdash; the share</p>
+        <div class="card e"><p class="ct"><span class="m">K</span>: the share</p>
           <p class="cb">Fraction of that base spent on inference. The genuinely unknown object, and the
             one every disagreement about this market is actually about.</p></div>
       </div>
@@ -334,20 +334,20 @@ h1.big{font-size:52px;line-height:1.06;letter-spacing:-.028em;font-weight:660;ma
         <span class="cap">Log-scales add; log-dispersions add with a correlation cross-term</span>
       </div>
       <p class="tx" style="margin-top:auto"><strong>Why this closure matters.</strong> Because the product
-        stays lognormal, the entire moment machinery downstream &mdash; truncation, compound sums, the
-        convergence diagnostic &mdash; keeps working on a two-parameter object. The decomposition buys
+        stays lognormal, the entire moment machinery downstream (truncation, compound sums, the
+        convergence diagnostic) keeps working on a two-parameter object. The decomposition buys
         interpretability at literally no analytical cost, which is rare enough to be worth naming.</p>
     </div>
     <div class="stack">
-      <p class="h3">What <span class="sym">&#961;</span> does &mdash; and why it is the cheapest parameter here</p>
+      <p class="h3">What <span class="sym">&#961;</span> does, and why it is the cheapest parameter here</p>
       <ul class="notes">
-        <li><b>Consumers: &#961;&nbsp;&lt;&nbsp;0.</b> Engel-curve behaviour &mdash; the token share of income
+        <li><b>Consumers: &#961;&nbsp;&lt;&nbsp;0.</b> Engel-curve behaviour: the token share of income
           falls as income rises. A negative &#961; <i>shrinks</i> &#963;<sub class="m">X</sub>, thinning the
           consumer tail.</li>
         <li><b>Enterprises: &#961;&nbsp;&gt;&nbsp;0.</b> Agent fleets scale super-linearly with firm size, so
           large firms spend a larger share of a larger base. This fattens the tail from both ends.</li>
         <li><b>&#961; = 0 recovers the independent case exactly.</b> One extra parameter per segment, zero loss
-          of tractability &mdash; and it enters &#963;<sup>2</sup> linearly but skewness exponentially.</li>
+          of tractability, and it enters &#963;<sup>2</sup> linearly but skewness exponentially.</li>
       </ul>
       <table style="margin-top:4px">
         <tr><th>Calibrated unit spend</th><th class="n"><span class="sym">&#956;<sub>X</sub></span></th><th class="n"><span class="sym">&#963;<sub>X</sub></span></th><th class="n">E[X]</th></tr>
@@ -355,7 +355,7 @@ h1.big{font-size:52px;line-height:1.06;letter-spacing:-.028em;font-weight:660;ma
         <tr class="tot"><td><span class="sw e"></span>Enterprise</td><td class="num">6.150</td><td class="num">2.163</td><td class="num">$4,866</td></tr>
       </table>
       <div class="card wash" style="margin-top:auto"><p class="cb">The baseline calibration sets
-        &#961; = 0 in both segments &mdash; not because independence is believed, but because the sign is
+        &#961; = 0 in both segments, not because independence is believed, but because the sign is
         confidently known and the magnitude is not. It is the first refinement to buy, and the cheapest.</p></div>
     </div>
   </div>
@@ -394,7 +394,7 @@ h1.big{font-size:52px;line-height:1.06;letter-spacing:-.028em;font-weight:660;ma
         <p class="h3">The same parameter, read as a concentration measure</p>
         <div class="eqbox">
           <span class="eq sm">mean / median = e<sup>&#963;&sup2;/2</sup></span>
-          <span class="cap">The wedge between the typical unit and the average unit &mdash; the object that
+          <span class="cap">The wedge between the typical unit and the average unit, the object that
             reappears as &#952; vs &#952;<sub>med</sub></span>
         </div>
       </div>
@@ -412,22 +412,22 @@ h1.big{font-size:52px;line-height:1.06;letter-spacing:-.028em;font-weight:660;ma
           skewness, because &#963; enters through e<sup>&#963;&sup2;</sup>: doubling &#963; quadruples the
           exponent.</li>
         <li>This is the formal content of "enterprise AI spend is concentrated in a handful of accounts."
-          It is not an anecdote about hyperscalers &mdash; it is a single parameter.</li>
-        <li>Every downstream question &mdash; convergence, tail risk, whether a normal confidence interval is
-          admissible &mdash; therefore reduces to <b>&#963;<sub class="m">X,e</sub></b>. The sensitivity
+          It is not an anecdote about hyperscalers; it is a single parameter.</li>
+        <li>Every downstream question (convergence, tail risk, whether a normal confidence interval is
+          admissible) therefore reduces to <b>&#963;<sub class="m">X,e</sub></b>. The sensitivity
           analysis rediscovers this numerically; the algebra says it in one line.</li>
         <li>It also sets the ceiling on precision. Because
           &#963;<sub class="m">X</sub><sup>2</sup> = &#963;<sub class="m">I</sub><sup>2</sup> +
           &#963;<sub class="m">K</sub><sup>2</sup> + 2&#961;&#963;<sub class="m">I</sub>&#963;<sub class="m">K</sub>,
           and &#963;<sub class="m">I</sub> is externally observable, the only dispersion left to argue about is
-          the penetration rate &mdash; which is where calibration effort belongs.</li>
+          the penetration rate, which is where calibration effort belongs.</li>
       </ul>
     </div>
   </div>
   <div class="takeaway"><span class="tk">Behaviour</span>
     <p>Shape is a one-parameter family. Any intervention that does not move
-      &#963;<sub class="m">X,e</sub> &mdash; more simulation draws, finer population data, a better mean
-      estimate &mdash; leaves the risk profile of the answer exactly where it was.</p></div>
+      &#963;<sub class="m">X,e</sub> (more simulation draws, finer population data, a better mean
+      estimate) leaves the risk profile of the answer exactly where it was.</p></div>
   <div class="brand">AI inference token TAM &middot; theory</div><div class="pnum">04</div>
 </section>
 
@@ -491,10 +491,10 @@ h1.big{font-size:52px;line-height:1.06;letter-spacing:-.028em;font-weight:660;ma
       </div>
       <ul class="notes sm">
         <li><b>A pure shape instrument.</b> A $60M/yr cap moves the enterprise mean from $4,866 to $4,863
-          &mdash; three dollars &mdash; while cutting aggregate skewness <b>0.51 &#8594; 0.09</b>. It buys
+          (three dollars) while cutting aggregate skewness <b>0.51 &#8594; 0.09</b>. It buys
           tractability without moving the headline.</li>
         <li><b>It voids the asymptotics.</b> Truncation destroys the e<sup>3&#963;&sup2;</sup> behaviour every
-          approximation ahead rests on. Under a cap only the exact expression applies &mdash; which is why the
+          approximation ahead rests on. Under a cap only the exact expression applies, which is why the
           production solver works on exact moments.</li>
         <li><b>It makes &#947; non-monotone in &#963;.</b> Past a point, extra dispersion no longer builds a
           tail; it piles mass against the ceiling and the distribution becomes <i>less</i> skewed. The blue
@@ -513,7 +513,7 @@ h1.big{font-size:52px;line-height:1.06;letter-spacing:-.028em;font-weight:660;ma
   <p class="eyebrow"><span class="n">05</span> &nbsp;/&nbsp; Counts</p>
   <h1 class="st wide">At national scale, sampling noise is not the uncertainty</h1>
   <p class="lede">The adopting count is not a free input. Deriving it from an adoption probability shows where
-    the variance in this market genuinely comes from &mdash; and it is not the coin flips.</p>
+    the variance in this market genuinely comes from, and it is not the coin flips.</p>
   <div class="rule"></div>
   <div class="body cols c-58">
     <div class="stack">
@@ -537,7 +537,7 @@ h1.big{font-size:52px;line-height:1.06;letter-spacing:-.028em;font-weight:660;ma
         At Pop &#8776; 10<sup>8</sup> the second is roughly <b>10<sup>8</sup>&times;</b> the first. What we do
         not know is the adoption <i>rate</i>, not the realisation of the individual draws.</p>
       <p class="tx" style="margin-top:auto"><strong>The practical reading.</strong> A Beta prior on
-        <span class="m">p</span> is not a technical nicety layered on a binomial &mdash; at national scale it
+        <span class="m">p</span> is not a technical nicety layered on a binomial; at national scale it
         <em class="k">is</em> the variance model, and the binomial underneath it is a rounding error.</p>
     </div>
     <div class="stack">
@@ -550,12 +550,12 @@ h1.big{font-size:52px;line-height:1.06;letter-spacing:-.028em;font-weight:660;ma
       </div>
       <ul class="notes sm">
         <li>At a 10% coefficient of variation on adoption, sd(TAM) rises from
-          <b>$0.11B to $3.02B</b> &mdash; a 27&times; widening driven entirely by parameter uncertainty.</li>
+          <b>$0.11B to $3.02B</b>, a 27&times; widening driven entirely by parameter uncertainty.</li>
         <li>This is why the deterministic-count approximation used in the convergence analysis must be
           <i>checked</i>, never assumed. In this calibration it is not merely inaccurate; it is describing a
           different regime (slide&nbsp;10).</li>
         <li>The implementation takes E[N], Var(N) and &#956;<sub>3</sub>(N) as inputs, so any count model
-          &mdash; Binomial, Beta-Binomial, or a diffusion process supplying three moments &mdash; plugs in
+          (Binomial, Beta-Binomial, or a diffusion process supplying three moments) plugs in
           unchanged.</li>
       </ul>
     </div>
@@ -570,9 +570,8 @@ h1.big{font-size:52px;line-height:1.06;letter-spacing:-.028em;font-weight:660;ma
 <section class="slide">
   <p class="eyebrow"><span class="n">06</span> &nbsp;/&nbsp; The engine</p>
   <h1 class="st wide">Wald, plus the third cumulant</h1>
-  <p class="lede">Cumulants of a compound sum compose &mdash;
-    <span class="m">K<sub>S</sub></span>(t) = <span class="m">K<sub>N</sub></span>(ln <span class="m">M<sub>X</sub></span>(t))
-    &mdash; so the third moment is exact rather than approximate. This is the whole computational engine.</p>
+  <p class="lede">Cumulants of a compound sum compose,
+    <span class="m">K<sub>S</sub></span>(t) = <span class="m">K<sub>N</sub></span>(ln <span class="m">M<sub>X</sub></span>(t)), so the third moment is exact rather than approximate. This is the whole computational engine.</p>
   <div class="rule"></div>
   <div class="body stack">
     <div class="eqbox key" style="padding-top:18px;padding-bottom:18px">
@@ -588,8 +587,7 @@ h1.big{font-size:52px;line-height:1.06;letter-spacing:-.028em;font-weight:660;ma
         <p class="h3">Reading the structure</p>
         <div class="termbar" style="flex-direction:column">
           <div class="t"><b>Every term is one X-moment &times; one N-moment</b>
-            Spend and count never mix inside a term, which is what makes variance attribution exact and free
-            &mdash; no simulation needed to say which parameter owns which share.</div>
+            Spend and count never mix inside a term, which is what makes variance attribution exact and free: no simulation needed to say which parameter owns which share.</div>
           <div class="t"><b>The orders differ</b>
             Spend terms scale as <span class="m">O</span>(E[N]); count terms as
             <span class="m">O</span>(E[N]&sup2;) once Var(N) &#8733; Pop&sup2;. At national scale the second
@@ -608,7 +606,7 @@ h1.big{font-size:52px;line-height:1.06;letter-spacing:-.028em;font-weight:660;ma
           <tr class="tot"><td>Total</td><td class="num">$42.2B</td><td class="num">100%</td><td class="num">100%</td></tr>
         </table>
         <p class="tx mut" style="font-size:12.6px">Deterministic-count point calibration. The segments split the
-          <i>mean</i> almost evenly &mdash; 42 / 58 &mdash; and the <i>risk</i> not at all.</p>
+          <i>mean</i> almost evenly (42 / 58) and the <i>risk</i> not at all.</p>
       </div>
     </div>
   </div>
@@ -624,7 +622,7 @@ h1.big{font-size:52px;line-height:1.06;letter-spacing:-.028em;font-weight:660;ma
   <p class="eyebrow"><span class="n">07</span> &nbsp;/&nbsp; Aggregation</p>
   <h1 class="st wide">The scale gap &#952;, and the covariance we know is missing</h1>
   <p class="lede">Segment aggregation is additive in the first two moments. The interesting object is the ratio
-    between the segments &mdash; and it has two definitions, deliberately.</p>
+    between the segments, and it has two definitions, deliberately.</p>
   <div class="rule"></div>
   <div class="body cols c-58">
     <div class="stack">
@@ -634,7 +632,7 @@ h1.big{font-size:52px;line-height:1.06;letter-spacing:-.028em;font-weight:660;ma
           + 2 Cov(TAM<sub>i</sub>, TAM<sub>e</sub>)</span>
       </div>
       <p class="tx"><strong>The covariance term is carried, not dropped.</strong> The baseline sets it to zero,
-        but both segments respond to the same shocks &mdash; capability jumps, price moves, macro conditions.
+        but both segments respond to the same shocks: capability jumps, price moves, macro conditions.
         So the sign of the bias is known: independence <em class="k">understates</em> total variance. A
         known-sign, one-directional bias is the acceptable kind; a latent common factor slots straight into
         this term without touching anything above it.</p>
@@ -677,7 +675,7 @@ h1.big{font-size:52px;line-height:1.06;letter-spacing:-.028em;font-weight:660;ma
 <section class="slide">
   <p class="eyebrow"><span class="n">08</span> &nbsp;/&nbsp; Diagnostic</p>
   <h1 class="st wide">When is a normal confidence interval admissible?</h1>
-  <p class="lede">The convergence analysis does not estimate TAM &mdash; the simulation does. It answers a
+  <p class="lede">The convergence analysis does not estimate TAM; the simulation does. It answers a
     narrower and more practical question: may I report &plusmn;1.96&#963;, or must I report simulated quantiles?</p>
   <div class="rule"></div>
   <div class="body cols c-2">
@@ -731,7 +729,7 @@ h1.big{font-size:52px;line-height:1.06;letter-spacing:-.028em;font-weight:660;ma
       </div>
       <ul class="notes sm">
         <li><b>It grows like <span class="m">&#8730;log N</span>.</b> Six orders of magnitude in market size
-          &mdash; 10<sup>3</sup> to 10<sup>9</sup> accounts &mdash; moves the threshold only from
+          (10<sup>3</sup> to 10<sup>9</sup> accounts) moves the threshold only from
           <b>0.88 to 2.32</b>. Loosening &#949; fourfold, from 0.05 to 0.20, buys just 1.77 to 2.02. Against a
           heavy tail the central limit theorem arrives logarithmically slowly.</li>
         <li><b>The verdict here.</b> &#963;<sub class="m">X,e</sub> = <b>2.163</b> sits above
@@ -743,7 +741,7 @@ h1.big{font-size:52px;line-height:1.06;letter-spacing:-.028em;font-weight:660;ma
   <div class="takeaway"><span class="tk">Behaviour</span>
     <p>The threshold moves like the square root of a logarithm while the skewness it is fighting moves like
       e<sup>3&#963;&sup2;/2</sup>. Concentration, not market size, decides whether this market is analytically
-      predictable &mdash; and the value of the diagnostic is precisely that it can fail. A check that always
+      predictable, and the value of the diagnostic is precisely that it can fail. A check that always
       passes says nothing about when to trust your own error bars.</p></div>
   <div class="brand">AI inference token TAM &middot; theory</div><div class="pnum">09</div>
 </section>
@@ -751,7 +749,7 @@ h1.big{font-size:52px;line-height:1.06;letter-spacing:-.028em;font-weight:660;ma
 <!-- ============ 10 · REGIMES ============ -->
 <section class="slide">
   <p class="eyebrow"><span class="n">09</span> &nbsp;/&nbsp; Regimes</p>
-  <h1 class="st wide">Three regimes &mdash; and the discipline of knowing which one you are in</h1>
+  <h1 class="st wide">Three regimes, and the discipline of knowing which one you are in</h1>
   <p class="lede">Each closed form below is correct inside its own envelope and badly wrong outside it. The
     envelopes are checkable, which is what makes the approximations usable at all.</p>
   <div class="rule"></div>
@@ -766,7 +764,7 @@ h1.big{font-size:52px;line-height:1.06;letter-spacing:-.028em;font-weight:660;ma
           <span class="rt"><u>&#8730;</u><s>ln(&#949;&sup2;E[N<sub>e</sub>])/3</s></span></span></div>
         <p class="cb" style="font-size:12px"><b style="color:var(--ink)">Here: this is the regime.</b> The
           closed form returns <b style="color:var(--ink)">1.899</b> against the exact numeric solution
-          <b style="color:var(--ink)">1.894</b> &mdash; agreement to 0.3%.</p>
+          <b style="color:var(--ink)">1.894</b>, agreement to 0.3%.</p>
         <p class="cb" style="font-size:12px;margin-top:auto">Note what the threshold does <i>not</i> contain:
           no &#952;, no consumer parameter, no &#956;. In this regime the entire question reduces to enterprise
           dispersion against enterprise account count.</p>
@@ -783,7 +781,7 @@ h1.big{font-size:52px;line-height:1.06;letter-spacing:-.028em;font-weight:660;ma
       </div>
       <div class="card a" style="display:flex;flex-direction:column;gap:8px">
         <p class="ct">C &middot; Count-dominated</p>
-        <p class="cb" style="font-size:12px">The regime both approximations discard &mdash; and the one the
+        <p class="cb" style="font-size:12px">The regime both approximations discard, and the one the
           calibration is actually in, once adoption uncertainty is admitted (slide&nbsp;6).</p>
         <div class="eqbox key" style="padding:10px"><span class="eq" style="font-size:14px">&#947;<sub>TAM</sub>
           &#8594; &#947;<sub>p</sub> &middot; H,&nbsp;&nbsp; H =
@@ -800,7 +798,7 @@ h1.big{font-size:52px;line-height:1.06;letter-spacing:-.028em;font-weight:660;ma
         <p class="tx" style="font-size:12.8px">&#952; contains &#963;<sub class="m">X,e</sub>, so solving for
           &#963;<sub class="m">crit</sub> with &#952; on the right-hand side is a transcendental equation
           wearing the clothes of a closed form. Either substitute the &#963;-free
-          &#952;<sub class="m">med</sub>, or <em class="k">root-find on the exact &#947;</em> &mdash; Brent's
+          &#952;<sub class="m">med</sub>, or <em class="k">root-find on the exact &#947;</em>: Brent's
           method, regime-free, cap- and &#961;-aware, hitting &#947; = &#949; to ~10<sup>&minus;9</sup>.</p>
       </div>
       <div>
@@ -814,7 +812,7 @@ h1.big{font-size:52px;line-height:1.06;letter-spacing:-.028em;font-weight:660;ma
     </div>
   </div>
   <div class="takeaway"><span class="tk">Behaviour</span>
-    <p>The model has a regime structure, and the regime &mdash; not the parameter values &mdash; determines
+    <p>The model has a regime structure, and the regime (not the parameter values) determines
       which formula is even meaningful. Checking the envelope before quoting a result is the whole
       methodological point.</p></div>
   <div class="brand">AI inference token TAM &middot; theory</div><div class="pnum">10</div>
@@ -851,13 +849,13 @@ h1.big{font-size:52px;line-height:1.06;letter-spacing:-.028em;font-weight:660;ma
       <p class="tx" style="font-size:13.2px">With &#963;<sub class="m">K</sub> &#8805; 0, the smallest attainable dispersion is
         &#963;<sub class="m">I</sub><span class="rt"><u>&#8730;</u><s>1&minus;&#961;&sup2;</s></span> for
         &#961; &lt; 0, and &#963;<sub class="m">I</sub> otherwise. That bound is what brackets the numeric
-        solver from below &mdash; without it the root-find can wander into parameterisations the model cannot
+        solver from below; without it the root-find can wander into parameterisations the model cannot
         represent.</p>
     </div>
     <div class="stack">
       <p class="h3">The count-dominated limit</p>
       <p class="tx">When Var(N) dominates, each segment total is approximately
-        <span class="m">TAM<sub>s</sub> &#8776; E[X<sub>s</sub>] N<sub>s</sub></span> &mdash; a deterministic
+        <span class="m">TAM<sub>s</sub> &#8776; E[X<sub>s</sub>] N<sub>s</sub></span>, a deterministic
         rescaling of the count. If both segments inherit the same adoption-prior skewness
         <span class="m">&#947;<sub>p</sub></span> and coefficient of variation, the
         <span class="m">E[X<sub>s</sub>]</span> and CV factors cancel between numerator and denominator:</p>
@@ -887,13 +885,13 @@ h1.big{font-size:52px;line-height:1.06;letter-spacing:-.028em;font-weight:660;ma
   <p class="eyebrow"><span class="n">A2</span> &nbsp;/&nbsp; Corrections</p>
   <h1 class="st wide">What re-deriving the framework actually caught</h1>
   <p class="lede">Three errors survived into a prior version of this framework. Each was found by checking the
-    algebra against the code, not by inspection &mdash; which is the argument for keeping both.</p>
+    algebra against the code, not by inspection, which is the argument for keeping both.</p>
   <div class="rule"></div>
   <div class="body stack" style="gap:14px">
     <div class="card" style="border-left:3px solid var(--enterprise)">
       <p class="ct">1 &middot; A dimensional error in the consumer-anchored threshold</p>
       <p class="cb">The earlier form read <span class="m">&#189; ln(&middot;)</span> with no outer square root:
-        wrong coefficient (&#189; rather than <span class="m">&#8537;</span>) and wrong dimension &mdash; it
+        wrong coefficient (&#189; rather than <span class="m">&#8537;</span>) and wrong dimension: it
         returns a &#963;&sup2;-like quantity while being labelled &#963;. In a test regime where both forms
         produce a number, the old one overstates &#963;<sub class="m">crit</sub> by roughly
         <b style="color:var(--ink)">7&times;</b>, which would license normal confidence intervals in a regime
@@ -904,8 +902,7 @@ h1.big{font-size:52px;line-height:1.06;letter-spacing:-.028em;font-weight:660;ma
       <p class="cb">The enterprise-dominance condition was stated as
         <span class="m">E[N<sub>e</sub>]&#952;&sup2; &#8811; E[N<sub>i</sub>]e<sup>&#963;&sup2;<sub style="margin-left:-.4em">X,i</sub></sup></span>,
         omitting the <span class="m">e<sup>&#963;&sup2;<sub style="margin-left:-.4em">X,e</sub></sup></span>
-        factor. That factor is negligible in the benign case and dominant in the high-concentration case
-        &mdash; that is, it matters precisely in the regime the analysis exists to study.</p>
+        factor. That factor is negligible in the benign case and dominant in the high-concentration case; that is, it matters precisely in the regime the analysis exists to study.</p>
     </div>
     <div class="card" style="border-left:3px solid var(--accent)">
       <p class="ct">3 &middot; A "closed form" that was transcendental</p>
@@ -917,7 +914,7 @@ h1.big{font-size:52px;line-height:1.06;letter-spacing:-.028em;font-weight:660;ma
     </div>
     <div class="card wash">
       <p class="cb"><b style="color:var(--ink)">The pattern.</b> None of these change the headline TAM. All
-        three change whether the reported uncertainty around it is defensible &mdash; which is the part a
+        three change whether the reported uncertainty around it is defensible, which is the part a
         client, a journalist, or a referee will actually lean on.</p>
     </div>
   </div>
@@ -975,7 +972,7 @@ h1.big{font-size:52px;line-height:1.06;letter-spacing:-.028em;font-weight:660;ma
       </table>
       <div class="card a"><p class="cb"><b style="color:var(--ink)">The contract.</b> The simulation's
         E[TAM], Var(TAM) and &#947;<sub class="m">TAM</sub> must match these closed forms within Monte Carlo
-        standard error before any downstream result &mdash; quantiles, sensitivity indices, figures &mdash; is
+        standard error before any downstream result (quantiles, sensitivity indices, figures) is
         trusted. The analytical layer exists to make the simulation falsifiable.</p></div>
     </div>
   </div>
