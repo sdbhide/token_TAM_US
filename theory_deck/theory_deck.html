@@ -1,0 +1,600 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AI Inference Token TAM: Structural Theory</title>
+<style>
+  :root{
+    --ink:#132238;
+    --muted:#64748b;
+    --line:#dbe3ec;
+    --soft:#f5f8fb;
+    --soft2:#eef4f2;
+    --accent:#137a67;
+    --accent2:#0f5f94;
+    --warn:#a05a16;
+    --danger:#a64242;
+    --shadow:0 14px 42px rgba(25,45,72,.10);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#fff;color:var(--ink);font-family:Arial,"Segoe UI",sans-serif}
+  body{font-size:16px}
+  .deck{width:100%;height:100%;position:relative;background:#fff}
+  .slide{
+    position:absolute;inset:0;display:none;
+    padding:4.7vh 5.4vw 4.1vh 5.4vw;
+    background:#fff;
+  }
+  .slide.active{display:flex;flex-direction:column}
+  .slide::before{
+    content:"";position:absolute;left:0;top:0;width:100%;height:6px;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+  }
+  .kicker{font-size:clamp(12px,1.05vw,20px);letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:1.1vh}
+  h1,h2,h3,p{margin-top:0}
+  h1{font-size:clamp(42px,4.4vw,82px);line-height:1.02;letter-spacing:-.035em;margin-bottom:2.1vh;max-width:1180px}
+  h2{font-size:clamp(31px,3.05vw,57px);line-height:1.05;letter-spacing:-.028em;margin-bottom:1.3vh}
+  h3{font-size:clamp(18px,1.55vw,29px);line-height:1.15;margin-bottom:.8vh}
+  .subtitle{font-size:clamp(19px,1.55vw,30px);line-height:1.4;color:#42536a;max-width:1050px}
+  .lede{font-size:clamp(18px,1.35vw,26px);line-height:1.45;color:#42536a;max-width:1140px;margin-bottom:2.2vh}
+  .small{font-size:clamp(12px,.92vw,18px);line-height:1.45;color:var(--muted)}
+  .tiny{font-size:clamp(10px,.72vw,14px);line-height:1.35;color:var(--muted)}
+  .accent{color:var(--accent)} .blue{color:var(--accent2)} .warn{color:var(--warn)}
+  .mono{font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace}
+  .math{font-family:Georgia,"Times New Roman",serif;font-style:italic;letter-spacing:.01em}
+  .eq{
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:clamp(20px,1.55vw,30px);line-height:1.35;
+    background:var(--soft);border:1px solid var(--line);border-radius:14px;
+    padding:1.3vh 1.35vw;margin:1vh 0;
+  }
+  .eq.compact{font-size:clamp(16px,1.15vw,22px);padding:1vh 1vw}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:2.4vw;flex:1;min-height:0;align-items:stretch}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.35vw;flex:1;min-height:0}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:1vw}
+  .card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:1.7vh 1.45vw;box-shadow:0 3px 12px rgba(25,45,72,.035)}
+  .card.soft{background:var(--soft)}
+  .card.green{background:var(--soft2);border-color:#cde0db}
+  .card .label{font-size:clamp(11px,.82vw,16px);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.7vh}
+  .card .big{font-size:clamp(26px,2.25vw,43px);font-weight:700;line-height:1.08;letter-spacing:-.02em}
+  .card p{font-size:clamp(14px,1.05vw,20px);line-height:1.42;color:#42536a;margin-bottom:0}
+  .pill{display:inline-block;padding:.38em .75em;border-radius:999px;background:var(--soft2);border:1px solid #cde0db;color:#315e56;font-size:clamp(11px,.8vw,15px);font-weight:700}
+  .pill.bluep{background:#eef5fa;border-color:#c9deeb;color:#275879}
+  .pill.warnp{background:#fbf4ea;border-color:#ead4b8;color:#80501c}
+  .rule{height:1px;background:var(--line);margin:1.2vh 0 1.7vh}
+  .list{margin:0;padding-left:1.2em;font-size:clamp(15px,1.12vw,21px);line-height:1.5;color:#33465f}
+  .list li{margin:.55vh 0}
+  .takeaway{border-left:5px solid var(--accent);padding:1.0vh 1.2vw;background:var(--soft2);border-radius:0 12px 12px 0;font-size:clamp(16px,1.2vw,23px);line-height:1.4;color:#284d47}
+  .callout{border:1px solid #cbd8e5;border-radius:16px;padding:1.25vh 1.2vw;background:#fbfdff}
+  .callout strong{color:var(--ink)}
+  .footer{position:absolute;left:5.4vw;right:5.4vw;bottom:1.55vh;display:flex;justify-content:space-between;align-items:center;font-size:clamp(9px,.67vw,13px);color:#8190a3}
+  .source{max-width:72%}
+  .num{font-variant-numeric:tabular-nums}
+  .slide-no{font-weight:700;color:#66778b}
+  .progress{position:fixed;bottom:0;left:0;height:4px;background:var(--accent);width:0;transition:width .15s ease;z-index:30}
+  .navhint{position:fixed;right:1.3vw;top:1.6vh;z-index:20;font-size:11px;color:#94a3b8;opacity:.8}
+  .appendix-badge{display:inline-flex;align-items:center;gap:.5em;color:#6b7280;font-size:clamp(11px,.83vw,16px);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:1.1vh}
+  .appendix-badge::before{content:"Appendix";padding:.32em .65em;border-radius:999px;background:#f2f4f7;border:1px solid #dce2e9;color:#667085}
+  .flow{display:flex;align-items:center;justify-content:center;gap:1vw}
+  .flow .node{border:1px solid var(--line);border-radius:16px;padding:1.2vh 1vw;background:#fff;text-align:center;min-width:140px}
+  .flow .arrow{font-size:clamp(22px,2vw,38px);color:#9aa9ba}
+  .split{display:grid;grid-template-columns:1fr .08fr 1fr;align-items:center;gap:1vw}
+  .segment{border:1px solid var(--line);border-radius:20px;padding:2vh 1.5vw;background:#fff;min-height:23vh;position:relative;overflow:hidden}
+  .segment.consumer::after,.segment.enterprise::after{content:"";position:absolute;right:-45px;bottom:-55px;width:150px;height:150px;border-radius:50%;background:#edf5fa}
+  .segment.enterprise::after{background:#eaf5f1}
+  .segicon{width:54px;height:54px;border-radius:15px;display:flex;align-items:center;justify-content:center;background:#eef5fa;color:var(--accent2);font-weight:700;font-size:24px;margin-bottom:1vh}
+  .enterprise .segicon{background:#eaf5f1;color:var(--accent)}
+  .formula-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:1.2vw}
+  .xbox{padding:2vh 1.3vw;border-radius:18px;border:1px solid var(--line);background:#fff;text-align:center}
+  .xbox .sym{font-family:Georgia,serif;font-style:italic;font-size:clamp(34px,3vw,56px);margin-bottom:.5vh}
+  .multiply{font-size:clamp(28px,2.7vw,50px);color:#93a2b5}
+  .spark{width:100%;height:84px;display:block;margin-top:.6vh}
+  .effect{display:flex;align-items:flex-start;gap:.75vw;margin:.75vh 0}
+  .effect .sign{flex:0 0 36px;height:36px;border-radius:10px;background:var(--soft2);display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:800;font-size:20px}
+  .effect .txt{font-size:clamp(14px,1vw,19px);line-height:1.38;color:#3c4d63}
+  .matrix{width:100%;border-collapse:separate;border-spacing:0;font-size:clamp(12px,.91vw,17px)}
+  .matrix th{background:#f4f7fa;color:#52657c;text-align:left;padding:.9vh .75vw;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .matrix td{padding:.92vh .75vw;border-bottom:1px solid #e6ebf1;color:#33465f;vertical-align:top}
+  .matrix tr:last-child td{border-bottom:0}
+  .matrix .up{color:var(--accent);font-weight:700}.matrix .down{color:var(--danger);font-weight:700}
+  .terms{display:grid;grid-template-columns:repeat(3,1fr);gap:1vw;margin-top:1.3vh}
+  .term{border-radius:16px;padding:1.25vh 1vw;border:1px solid var(--line);background:#fff}
+  .term .tag{font-size:clamp(11px,.78vw,15px);font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5vh}
+  .term .tmath{font-family:Georgia,serif;font-size:clamp(16px,1.15vw,22px);margin-bottom:.6vh}
+  .term p{font-size:clamp(12px,.91vw,17px);line-height:1.38;color:#53657a;margin:0}
+  .sigma-panel{display:grid;grid-template-columns:1.08fr .92fr;gap:1.6vw;align-items:stretch;flex:1;min-height:0}
+  .chartbox{border:1px solid var(--line);border-radius:18px;padding:1.1vh .9vw;background:#fff;display:flex;align-items:center;justify-content:center}
+  .chartbox svg{max-width:100%;max-height:100%}
+  .pipeline{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:1vw;margin-top:2.2vh}
+  .pipebox{border:1px solid var(--line);border-radius:18px;padding:1.7vh 1.1vw;background:#fff;min-height:18vh}
+  .pipebox .step{font-size:clamp(11px,.8vw,15px);text-transform:uppercase;letter-spacing:.08em;color:var(--accent);font-weight:700;margin-bottom:.7vh}
+  .pipebox h3{margin-bottom:.65vh}
+  .pipebox p{font-size:clamp(13px,.95vw,18px);color:#53657a;line-height:1.4;margin:0}
+  .arrowbig{font-size:clamp(28px,2.5vw,46px);color:#a4b0bf}
+  .title-meta{display:flex;gap:.75vw;flex-wrap:wrap;margin-top:2.6vh}
+  .title-mark{position:absolute;right:5.4vw;bottom:10vh;width:260px;height:260px;border-radius:50%;border:1px solid #dfe8ee}
+  .title-mark::before,.title-mark::after{content:"";position:absolute;border-radius:50%;border:1px solid #d8e7e2}
+  .title-mark::before{inset:35px}.title-mark::after{inset:72px}
+  .title-mark .dot{position:absolute;width:16px;height:16px;border-radius:50%;background:var(--accent);left:54px;top:58px;box-shadow:111px 74px 0 var(--accent2),72px 148px 0 #7aa99f}
+  .three-note{display:grid;grid-template-columns:repeat(3,1fr);gap:1vw;margin-top:1.4vh}
+  .note{padding:1.25vh 1vw;border-top:3px solid var(--accent);background:#fbfcfd;border-radius:0 0 12px 12px}
+  .note:nth-child(2){border-top-color:var(--accent2)}.note:nth-child(3){border-top-color:var(--warn)}
+  .note b{display:block;font-size:clamp(16px,1.1vw,21px);margin-bottom:.35vh}.note span{font-size:clamp(12px,.88vw,17px);line-height:1.35;color:#56687c}
+  .assump{display:grid;grid-template-columns:90px 1fr;gap:.8vw;padding:.85vh 0;border-bottom:1px solid #e7ecf1}
+  .assump:last-child{border-bottom:0}.assump .a{font-weight:800;color:var(--accent)}.assump .d{font-size:clamp(13px,.95vw,18px);line-height:1.4;color:#45586e}
+  .formula-sheet{display:grid;grid-template-columns:1fr 1fr;gap:1.3vw;flex:1;min-height:0}
+  .formula-sheet .card{padding:1.1vh 1vw}
+  .formula-sheet h3{font-size:clamp(16px,1.2vw,23px);margin-bottom:.5vh}
+  .formula-sheet .eq{margin:.5vh 0;font-size:clamp(13px,1vw,19px);padding:.65vh .65vw}
+  .impl{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1vw;margin-top:1.2vh}
+  .impl .card{min-height:20vh}
+  .check{display:inline-block;margin-top:.75vh;color:var(--accent);font-weight:700;font-size:clamp(12px,.9vw,17px)}
+  @media (max-width: 1000px){
+    .slide{padding:4.5vh 4.5vw 4.4vh}.footer{left:4.5vw;right:4.5vw}.title-mark{display:none}
+    .grid3,.grid4{gap:.8vw}.card{padding:1.2vh 1vw}
+  }
+  @media print{
+    @page{size:13.333in 7.5in;margin:0}
+    html,body{overflow:visible;height:auto;width:13.333in}.navhint,.progress{display:none!important}.deck{height:auto;width:13.333in}
+    .slide,.slide.active{position:relative;display:flex!important;flex-direction:column!important;width:13.333in;height:7.5in;page-break-after:always;padding:.45in .58in .42in;background:#fff}
+    .slide::before{height:4px}.footer{position:absolute;left:.58in;right:.58in;bottom:.18in}
+  }
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+  <section class="slide active" data-title="Title">
+    <div class="kicker">Structural theory · US AI inference token market</div>
+    <h1>From Micro Heterogeneity<br>to a Market-Size Distribution</h1>
+    <p class="subtitle">A closed-form framework for understanding the <b>level</b>, <b>uncertainty</b>, and <b>tail behavior</b> of consumer and enterprise inference-token expenditure.</p>
+    <div class="title-meta">
+      <span class="pill">Two-segment compound model</span>
+      <span class="pill bluep">Closed-form first 3 moments</span>
+      <span class="pill warnp">Gaussianity as a diagnostic</span>
+    </div>
+    <div class="title-mark"><div class="dot"></div></div>
+    <div class="footer"><span class="source">Based on <span class="mono">ai_inference_tam_theory_v4.md</span></span><span class="slide-no">1</span></div>
+  </section>
+
+  <section class="slide" data-title="Architecture">
+    <div class="kicker">1 · Model architecture</div>
+    <h2>One TAM, two economically distinct stochastic processes</h2>
+    <p class="lede">Consumers and enterprises differ in population scale, spend scale, and tail concentration. Modeling them separately preserves those structural differences before aggregation.</p>
+    <div class="split" style="flex:1;min-height:0">
+      <div class="segment consumer">
+        <div class="segicon">i</div>
+        <h3>Consumer segment</h3>
+        <div class="eq compact">TAM<sub>i</sub> = Σ<sub>j=1…Nᵢ</sub> X<sub>i,j</sub></div>
+        <ul class="list">
+          <li>Very large eligible population</li>
+          <li>Lower per-unit annual spend</li>
+          <li>Potentially negative income–share correlation</li>
+        </ul>
+      </div>
+      <div style="text-align:center;color:#94a3b8;font-size:clamp(28px,2.5vw,48px);font-weight:300">+</div>
+      <div class="segment enterprise">
+        <div class="segicon">e</div>
+        <h3>Enterprise segment</h3>
+        <div class="eq compact">TAM<sub>e</sub> = Σ<sub>k=1…Nₑ</sub> X<sub>e,k</sub></div>
+        <ul class="list">
+          <li>Smaller account population</li>
+          <li>Much larger per-account spend</li>
+          <li>Heavier concentration from firm scale + agent intensity</li>
+        </ul>
+      </div>
+    </div>
+    <div class="takeaway"><b>Structural question:</b> the same mean TAM can arise from very different combinations of adoption, spend dispersion, and concentration, so the distribution matters, not only the point estimate.</div>
+    <div class="footer"><span class="source">Theory §1 · A1–A4 define the baseline independence and stable-price assumptions.</span><span class="slide-no">2</span></div>
+  </section>
+
+  <section class="slide" data-title="Unit spend">
+    <div class="kicker">2 · Unit-level economics</div>
+    <h2>Per-unit spend separates economic capacity from AI intensity</h2>
+    <p class="lede">For each segment, annual token expenditure is the product of a scale variable <span class="math">I</span> and a token-spend share <span class="math">K</span>.</p>
+    <div class="grid2">
+      <div class="card soft" style="display:flex;flex-direction:column;justify-content:center">
+        <div class="formula-row">
+          <div class="xbox">
+            <div class="sym">I</div>
+            <div class="label">Economic scale</div>
+            <p>Consumer income<br>or enterprise IT/firm scale</p>
+          </div>
+          <div class="multiply">×</div>
+          <div class="xbox">
+            <div class="sym">K</div>
+            <div class="label">AI intensity</div>
+            <p>Share of economic capacity<br>spent on inference tokens</p>
+          </div>
+        </div>
+        <div class="eq" style="text-align:center;margin-top:2vh">X = K · I</div>
+      </div>
+      <div class="card">
+        <div class="label">Correlation preserves tractability</div>
+        <div class="eq compact">ln X = ln I + ln K</div>
+        <div class="eq compact">μ<sub>X</sub> = μ<sub>I</sub> + μ<sub>K</sub></div>
+        <div class="eq compact">σ²<sub>X</sub> = σ²<sub>I</sub> + σ²<sub>K</sub> + 2ρσ<sub>I</sub>σ<sub>K</sub></div>
+        <div class="rule"></div>
+        <div class="effect"><div class="sign">−</div><div class="txt"><b>ρ &lt; 0</b> compresses the spend distribution. Economically: richer consumers can spend a smaller share on tokens.</div></div>
+        <div class="effect"><div class="sign">+</div><div class="txt"><b>ρ &gt; 0</b> fattens the upper tail. Economically: larger firms can also allocate a larger share to autonomous workloads.</div></div>
+      </div>
+    </div>
+    <div class="footer"><span class="source">Theory §2–§3.1 · Product of correlated lognormals remains lognormal.</span><span class="slide-no">3</span></div>
+  </section>
+
+  <section class="slide" data-title="Moment behavior">
+    <div class="kicker">3 · Closed-form comparative statics</div>
+    <h2>The mean is simple; dispersion is nonlinear</h2>
+    <p class="lede">The lognormal moments make parameter behavior transparent before any simulation is run.</p>
+    <div class="grid3">
+      <div class="card">
+        <div class="label">Level</div>
+        <div class="big math">E[X] = e<sup>μ + σ²/2</sup></div>
+        <svg class="spark" viewBox="0 0 280 84" aria-label="mean rises exponentially">
+          <path d="M12 70 C70 68, 125 61, 170 44 C210 28, 235 17, 268 9" fill="none" stroke="#137a67" stroke-width="4" stroke-linecap="round"/>
+          <line x1="12" y1="73" x2="270" y2="73" stroke="#d4dde7"/><line x1="12" y1="8" x2="12" y2="73" stroke="#d4dde7"/>
+        </svg>
+        <p><b>μ</b> shifts the entire distribution one-for-one in logs. <b>σ</b> also raises the mean through Jensen’s inequality.</p>
+      </div>
+      <div class="card">
+        <div class="label">Variance</div>
+        <div class="big math">Var(X)</div>
+        <div class="eq compact">(e<sup>σ²</sup> − 1)e<sup>2μ+σ²</sup></div>
+        <svg class="spark" viewBox="0 0 280 84" aria-label="variance is very convex in sigma">
+          <path d="M12 72 C110 72, 150 68, 188 55 C225 42, 248 22, 268 7" fill="none" stroke="#0f5f94" stroke-width="4" stroke-linecap="round"/>
+          <line x1="12" y1="73" x2="270" y2="73" stroke="#d4dde7"/><line x1="12" y1="8" x2="12" y2="73" stroke="#d4dde7"/>
+        </svg>
+        <p>Dispersion is not “just uncertainty.” In a lognormal, more dispersion also reallocates mass into very high-spend outcomes.</p>
+      </div>
+      <div class="card">
+        <div class="label">Skewness driver</div>
+        <div class="big math">μ₃(X)</div>
+        <div class="eq compact">∝ (e<sup>σ²</sup>+2)√(e<sup>σ²</sup>−1) · Var(X)<sup>3/2</sup></div>
+        <svg class="spark" viewBox="0 0 280 84" aria-label="third moment rises sharply">
+          <path d="M12 73 C150 73, 192 69, 222 47 C247 29, 258 15, 268 5" fill="none" stroke="#a05a16" stroke-width="4" stroke-linecap="round"/>
+          <line x1="12" y1="73" x2="270" y2="73" stroke="#d4dde7"/><line x1="12" y1="8" x2="12" y2="73" stroke="#d4dde7"/>
+        </svg>
+        <p>The third moment accelerates fastest. That is why enterprise concentration can dominate <i>predictability</i> even when the mean remains plausible.</p>
+      </div>
+    </div>
+    <div class="three-note">
+      <div class="note"><b>↑ μ<sub>I</sub> or μ<sub>K</sub></b><span>Raises mean spend proportionally in logs; all dollar moments scale upward.</span></div>
+      <div class="note"><b>↑ σ<sub>I</sub>, σ<sub>K</sub>, or ρ</b><span>Raises σ²<sub>X</sub>; mean rises, but variance and skewness rise much faster.</span></div>
+      <div class="note"><b>Implication</b><span>Calibrating dispersion is economically consequential, not merely a confidence-band exercise.</span></div>
+    </div>
+    <div class="footer"><span class="source">Theory §3.1 · Untruncated lognormal moments.</span><span class="slide-no">4</span></div>
+  </section>
+
+  <section class="slide" data-title="Caps">
+    <div class="kicker">4 · Tail discipline</div>
+    <h2>A hard cap is a modeling choice, not a cosmetic refinement</h2>
+    <p class="lede">The unconstrained lognormal has infinite support. Economic budgets do not. Truncation preserves closed-form moments while removing implausible tail mass.</p>
+    <div class="grid2">
+      <div class="chartbox">
+        <svg viewBox="0 0 620 390" role="img" aria-label="lognormal tail and cap">
+          <defs><linearGradient id="g1" x1="0" x2="1"><stop offset="0" stop-color="#0f5f94" stop-opacity=".18"/><stop offset="1" stop-color="#0f5f94" stop-opacity=".02"/></linearGradient></defs>
+          <line x1="60" y1="325" x2="575" y2="325" stroke="#bcc8d5" stroke-width="2"/>
+          <line x1="60" y1="45" x2="60" y2="325" stroke="#bcc8d5" stroke-width="2"/>
+          <path d="M62 325 C92 285,110 155,165 105 C215 59,270 102,315 160 C365 225,420 271,575 316 L575 325 Z" fill="url(#g1)"/>
+          <path d="M62 325 C92 285,110 155,165 105 C215 59,270 102,315 160 C365 225,420 271,575 316" fill="none" stroke="#0f5f94" stroke-width="5" stroke-linecap="round"/>
+          <line x1="428" y1="66" x2="428" y2="325" stroke="#a64242" stroke-width="4" stroke-dasharray="10 8"/>
+          <path d="M428 268 C470 290,520 306,575 316" fill="none" stroke="#a64242" stroke-width="5" stroke-linecap="round" stroke-dasharray="7 7"/>
+          <text x="442" y="88" font-size="22" fill="#a64242" font-family="Arial" font-weight="700">hard cap c</text>
+          <text x="445" y="120" font-size="17" fill="#6b7280" font-family="Arial">tail removed</text>
+          <text x="250" y="365" font-size="18" fill="#64748b" font-family="Arial">annual spend X →</text>
+          <text x="16" y="55" font-size="17" fill="#64748b" font-family="Arial" transform="rotate(-90 16 55)">density</text>
+        </svg>
+      </div>
+      <div class="card">
+        <div class="label">Truncated raw moments remain analytic</div>
+        <div class="eq compact">E[X<sup>k</sup> | X≤c] = e<sup>kμ + k²σ²/2</sup> · Φ(d<sub>k</sub>)/Φ(d<sub>0</sub>)</div>
+        <div class="eq compact">d<sub>k</sub> = (ln c − μ − kσ²)/σ</div>
+        <div class="rule"></div>
+        <table class="matrix">
+          <tr><th>Lower cap</th><th>Expected behavior</th></tr>
+          <tr><td class="down">E[X] ↓</td><td>Moderate effect unless the cap cuts into meaningful probability mass.</td></tr>
+          <tr><td class="down">Var(X) ↓↓</td><td>Large high-spend realizations lose disproportionate weight.</td></tr>
+          <tr><td class="down">μ₃(X) ↓↓↓</td><td>Third moments are most tail-sensitive; aggregate skewness can collapse quickly.</td></tr>
+        </table>
+        <div class="takeaway" style="margin-top:1.3vh"><b>Interpretation:</b> the cap encodes an economic feasibility constraint. If it materially changes Gaussianity, that is information about how much the uncapped result relied on implausible extremes.</div>
+      </div>
+    </div>
+    <div class="footer"><span class="source">Theory §3.2–§3.3 · Hard truncation and tail-shape caveat.</span><span class="slide-no">5</span></div>
+  </section>
+
+  <section class="slide" data-title="Counts">
+    <div class="kicker">5 · Adoption counts</div>
+    <h2>At national scale, uncertainty about <i>p</i> can matter more than sampling noise</h2>
+    <p class="lede">The number of adopters is itself random. The distinction between a known adoption rate and an uncertain adoption rate changes the order of magnitude of count variance.</p>
+    <div class="grid2">
+      <div class="card soft">
+        <div class="label">Known adoption probability</div>
+        <h3>Binomial count</h3>
+        <div class="eq compact">N ~ Binomial(Pop, p)</div>
+        <div class="eq compact">E[N] = Pop·p</div>
+        <div class="eq compact">Var(N) = Pop·p(1−p)</div>
+        <div class="callout small" style="margin-top:1.1vh"><strong>Scaling:</strong> sampling variance is O(Pop).</div>
+      </div>
+      <div class="card green">
+        <div class="label">Uncertain adoption probability</div>
+        <h3>Beta-Binomial count</h3>
+        <div class="eq compact">p ~ Beta(α,β) ⇒ N ~ Beta-Binomial</div>
+        <div class="eq compact">Var(N) = Pop·p̄(1−p̄) [1 + (Pop−1)/(α+β+1)]</div>
+        <div class="callout small" style="margin-top:1.1vh"><strong>Scaling:</strong> parameter uncertainty contributes an O(Pop²) term.</div>
+      </div>
+    </div>
+    <div class="takeaway"><b>US-scale implication:</b> “millions of adopters” does not automatically make N deterministic. If the equilibrium adoption rate is uncertain, uncertainty in <span class="math">p</span> can dominate the realized Bernoulli noise.</div>
+    <div class="footer"><span class="source">Theory §4 · Any count model can plug in if its first three central moments are available.</span><span class="slide-no">6</span></div>
+  </section>
+
+  <section class="slide" data-title="Compound moments">
+    <div class="kicker">6 · Compound-sum closed forms</div>
+    <h2>The formulas identify exactly where aggregate uncertainty comes from</h2>
+    <p class="lede">For TAM<sub>s</sub> = Σ<sub>j=1…Nₛ</sub> X<sub>s,j</sub>, the first three moments separate spend heterogeneity, adoption uncertainty, and their interaction.</p>
+    <div class="eq" style="text-align:center">E[TAM<sub>s</sub>] = E[N<sub>s</sub>] · E[X<sub>s</sub>]</div>
+    <div class="eq" style="text-align:center">Var(TAM<sub>s</sub>) = <span style="color:#0f5f94">E[N<sub>s</sub>] Var(X<sub>s</sub>)</span> + <span style="color:#137a67">E[X<sub>s</sub>]<sup>2</sup> Var(N<sub>s</sub>)</span></div>
+    <div class="terms">
+      <div class="term">
+        <div class="tag">Spend-risk term</div>
+        <div class="tmath" style="color:#0f5f94">E[N] · Var(X)</div>
+        <p>More adopters diversify idiosyncratic spend, but aggregate variance still accumulates linearly with N.</p>
+      </div>
+      <div class="term">
+        <div class="tag">Adoption-risk term</div>
+        <div class="tmath" style="color:#137a67">E[X]² · Var(N)</div>
+        <p>Uncertainty in how many units adopt is magnified by the square of average spend.</p>
+      </div>
+      <div class="term">
+        <div class="tag">Third-moment interaction</div>
+        <div class="tmath" style="color:#a05a16">3 Var(N) E[X] Var(X)</div>
+        <p>Count uncertainty and spend dispersion interact directly in aggregate skewness.</p>
+      </div>
+    </div>
+    <div class="eq compact" style="margin-top:1.1vh;text-align:center">μ₃(TAM<sub>s</sub>) = E[N]μ₃(X) + 3Var(N)E[X]Var(X) + μ₃(N)E[X]³</div>
+    <div class="footer"><span class="source">Theory §5 · Wald expectation/variance plus exact third-cumulant expansion.</span><span class="slide-no">7</span></div>
+  </section>
+
+  <section class="slide" data-title="Whole market">
+    <div class="kicker">7 · Whole-market structure</div>
+    <h2>Scale gaps affect the level; common shocks affect the risk</h2>
+    <p class="lede">Aggregation is additive, but two structural objects deserve separate attention: the enterprise-to-consumer scale gap <span class="math">θ</span>, and cross-segment covariance.</p>
+    <div class="grid2">
+      <div class="card soft">
+        <div class="label">Structural scale factor</div>
+        <div class="big math">θ = E[Xₑ] / E[Xᵢ]</div>
+        <div class="eq compact">θ = exp[(μ<sub>X,e</sub>−μ<sub>X,i</sub>) + (σ²<sub>X,e</sub>−σ²<sub>X,i</sub>)/2]</div>
+        <div class="rule"></div>
+        <div class="effect"><div class="sign">1</div><div class="txt"><b>Mean-ratio θ</b> is economically meaningful, but it inherits enterprise dispersion.</div></div>
+        <div class="effect"><div class="sign">2</div><div class="txt"><b>Median-ratio θ<sub>med</sub></b> removes σ<sub>X,e</sub> and is useful only to keep one convergence approximation algebraically closed.</div></div>
+      </div>
+      <div class="card">
+        <div class="label">Aggregation with a covariance hook</div>
+        <div class="eq compact">E[TAM] = E[TAMᵢ] + E[TAMₑ]</div>
+        <div class="eq compact">Var(TAM) = Var(TAMᵢ) + Var(TAMₑ) + 2Cov(TAMᵢ,TAMₑ)</div>
+        <div class="rule"></div>
+        <p style="font-size:clamp(15px,1.08vw,20px);line-height:1.45;color:#42536a"><b>Baseline:</b> Cov = 0 for tractability.</p>
+        <p style="font-size:clamp(15px,1.08vw,20px);line-height:1.45;color:#42536a"><b>Economic reality:</b> model capability, token prices, and macro conditions can move both segments together.</p>
+        <div class="takeaway" style="margin-top:1.1vh"><b>Direction of bias:</b> positive common shocks mean the independent-segment baseline understates total variance.</div>
+      </div>
+    </div>
+    <div class="footer"><span class="source">Theory §6 · θ separates spend-scale structure from the count process.</span><span class="slide-no">8</span></div>
+  </section>
+
+  <section class="slide" data-title="Gaussianity">
+    <div class="kicker">8 · Gaussian convergence diagnostic</div>
+    <h2>Large N helps, but concentration can overwhelm diversification</h2>
+    <p class="lede">The exact diagnostic is aggregate skewness. Closed-form approximations then reveal which structural parameters govern the speed of convergence toward normality.</p>
+    <div class="sigma-panel">
+      <div class="card soft">
+        <div class="label">Exact criterion</div>
+        <div class="eq compact">γ<sub>TAM</sub> = [μ₃(TAMᵢ)+μ₃(TAMₑ)] / [Var(TAMᵢ)+Var(TAMₑ)]<sup>3/2</sup> ≤ ε</div>
+        <div class="rule"></div>
+        <div class="label">Regime A · enterprise-dominated variance</div>
+        <div class="eq compact">γ ≈ e<sup>(3/2)σ²<sub>X,e</sub></sup> / √E[Nₑ]</div>
+        <div class="eq compact">σ<sub>crit</sub> = √{ (1/3) ln[ε² E[Nₑ]] }</div>
+        <table class="matrix" style="margin-top:1vh">
+          <tr><th>Parameter move</th><th>Effect on Gaussianity</th></tr>
+          <tr><td>↑ Nₑ</td><td class="up">Helps, but only through √log(Nₑ) in σ<sub>crit</sub>.</td></tr>
+          <tr><td>↑ σ<sub>X,e</sub></td><td class="down">Hurts explosively: log γ rises as 1.5σ².</td></tr>
+          <tr><td>↑ θ</td><td>Approximately cancels in this regime.</td></tr>
+        </table>
+      </div>
+      <div class="chartbox" style="flex-direction:column;align-items:stretch;justify-content:flex-start">
+        <div class="label" style="padding-left:.4vw">Schematic convergence frontier</div>
+        <svg viewBox="0 0 500 320" role="img" aria-label="critical sigma increases slowly with N">
+          <line x1="66" y1="258" x2="460" y2="258" stroke="#bcc8d5" stroke-width="2"/>
+          <line x1="66" y1="30" x2="66" y2="258" stroke="#bcc8d5" stroke-width="2"/>
+          <path d="M82 230 C140 205, 205 178, 270 157 C335 136, 390 124, 447 116" fill="none" stroke="#137a67" stroke-width="5" stroke-linecap="round"/>
+          <path d="M66 258 L82 230 C140 205,205 178,270 157 C335 136,390 124,447 116 L447 258 Z" fill="#eaf5f1" opacity=".9"/>
+          <text x="170" y="238" font-family="Arial" font-size="17" fill="#315e56" font-weight="700">γ ≤ ε: normal approximation safer</text>
+          <text x="245" y="76" font-family="Arial" font-size="17" fill="#8a4b19" font-weight="700">higher concentration → simulate</text>
+          <text x="205" y="294" font-family="Arial" font-size="17" fill="#64748b">E[Nₑ] → (log scale)</text>
+          <text x="20" y="175" font-family="Arial" font-size="17" fill="#64748b" transform="rotate(-90 20 175)">σₓ,ₑ</text>
+          <text x="325" y="145" font-family="Arial" font-size="15" fill="#137a67">σcrit ∝ √ln Nₑ</text>
+        </svg>
+        <div class="callout small" style="margin:.4vh .4vw 0"><strong>Regime B:</strong> when consumer variance anchors the denominator, θ enters with very high power. With realistic θ ≫ 1, the domain condition often fails, signaling that Regime A or the exact numeric solver is the appropriate description.</div>
+      </div>
+    </div>
+    <div class="footer"><span class="source">Theory §7.1–§7.4 · Approximations require heavy enterprise tail, near-deterministic counts, no caps, and enterprise skew dominance.</span><span class="slide-no">9</span></div>
+  </section>
+
+  <section class="slide" data-title="Role of theory">
+    <div class="kicker">9 · Role of the analytical layer</div>
+    <h2>Closed forms explain the model; simulation estimates the distribution</h2>
+    <p class="lede">The analytical core is most valuable as a structural map and a validation standard, not as a substitute for Monte Carlo in the heavy-tail regimes that matter most.</p>
+    <div class="pipeline">
+      <div class="pipebox">
+        <div class="step">Theory</div>
+        <h3>Closed-form moments</h3>
+        <p>Expose comparative statics, isolate risk terms, and identify where a normal approximation can plausibly work.</p>
+      </div>
+      <div class="arrowbig">→</div>
+      <div class="pipebox">
+        <div class="step">Computation</div>
+        <h3>Monte Carlo distribution</h3>
+        <p>Handles the full non-Gaussian distribution, parameter uncertainty, caps, and tail quantiles without relying on asymptotic normality.</p>
+      </div>
+      <div class="arrowbig">→</div>
+      <div class="pipebox">
+        <div class="step">Communication</div>
+        <h3>Scenario interpretation</h3>
+        <p>Translate a model with heavy heterogeneity into a small number of economic levers and explain what moves level versus risk.</p>
+      </div>
+    </div>
+    <div class="three-note" style="margin-top:2.1vh">
+      <div class="note"><b>Level</b><span>μ and adoption scale move expected TAM directly.</span></div>
+      <div class="note"><b>Uncertainty</b><span>σ, ρ, adoption-rate uncertainty, and covariance determine how dispersed the market can be.</span></div>
+      <div class="note"><b>Predictability</b><span>Enterprise concentration and caps determine when analytical confidence intervals are trustworthy.</span></div>
+    </div>
+    <div class="takeaway" style="margin-top:1.6vh"><b>Core economic insight:</b> the framework distinguishes “how big could the market be?” from “how concentrated is the spending process that produces it?” Those are different calibration problems.</div>
+    <div class="footer"><span class="source">Theory §7.5 + §9 · Production implementation uses exact skewness and numerical root-finding when approximations fail.</span><span class="slide-no">10</span></div>
+  </section>
+
+  <section class="slide" data-title="Formula sheet">
+    <div class="appendix-badge">A · Formula sheet</div>
+    <h2>Closed-form reference</h2>
+    <div class="formula-sheet">
+      <div class="card">
+        <h3>Unit spend</h3>
+        <div class="eq">μ<sub>X</sub> = μ<sub>I</sub> + μ<sub>K</sub></div>
+        <div class="eq">σ²<sub>X</sub> = σ²<sub>I</sub> + σ²<sub>K</sub> + 2ρσ<sub>I</sub>σ<sub>K</sub></div>
+        <div class="eq">E[X] = e<sup>μ+σ²/2</sup></div>
+        <div class="eq">Var(X) = (e<sup>σ²</sup>−1)e<sup>2μ+σ²</sup></div>
+      </div>
+      <div class="card">
+        <h3>Truncation</h3>
+        <div class="eq">E[X<sup>k</sup>|X≤c] = e<sup>kμ+k²σ²/2</sup> Φ(d<sub>k</sub>)/Φ(d<sub>0</sub>)</div>
+        <div class="eq">d<sub>k</sub> = (ln c − μ − kσ²)/σ</div>
+        <h3 style="margin-top:1vh">Count moments</h3>
+        <div class="eq">E[N]=Pop·p</div>
+        <div class="eq">Var<sub>Bin</sub>(N)=Pop·p(1−p)</div>
+      </div>
+      <div class="card">
+        <h3>Compound sum</h3>
+        <div class="eq">E[TAM<sub>s</sub>] = E[N]E[X]</div>
+        <div class="eq">Var(TAM<sub>s</sub>) = E[N]Var(X)+E[X]²Var(N)</div>
+        <div class="eq">μ₃(TAM<sub>s</sub>) = E[N]μ₃(X)+3Var(N)E[X]Var(X)+μ₃(N)E[X]³</div>
+      </div>
+      <div class="card">
+        <h3>Convergence</h3>
+        <div class="eq">γ<sub>TAM</sub> = μ₃(TAM)/Var(TAM)<sup>3/2</sup></div>
+        <div class="eq">Regime A: γ ≈ e<sup>1.5σ²<sub>X,e</sub></sup>/√E[Nₑ]</div>
+        <div class="eq">σ<sub>crit</sub> = √{(1/3)ln(ε²E[Nₑ])}</div>
+        <div class="eq">θ = E[Xₑ]/E[Xᵢ]</div>
+      </div>
+    </div>
+    <div class="footer"><span class="source">Appendix · Condensed from theory §§3–7.</span><span class="slide-no">A1</span></div>
+  </section>
+
+  <section class="slide" data-title="Assumptions">
+    <div class="appendix-badge">B · Assumptions & extensions</div>
+    <h2>Where the baseline can fail, and the direction of concern</h2>
+    <div class="grid2" style="margin-top:.8vh">
+      <div class="card">
+        <div class="assump"><div class="a">A1</div><div class="d"><b>Within-segment i.i.d.</b> spend abstracts from network effects and account-level clustering.</div></div>
+        <div class="assump"><div class="a">A2</div><div class="d"><b>N ⟂ X.</b> At partial penetration, adopters may be positively selected on income, firm size, or AI intensity.</div></div>
+        <div class="assump"><div class="a">A3</div><div class="d"><b>Consumer ⟂ enterprise.</b> Common macro/capability shocks imply positive covariance, so the baseline can understate total variance.</div></div>
+        <div class="assump"><div class="a">A4</div><div class="d"><b>Stable token prices.</b> Price decline and demand elasticity can create Jevons-style feedback between price and token volume.</div></div>
+      </div>
+      <div class="card soft">
+        <div class="label">Most important structural extensions</div>
+        <ul class="list">
+          <li><b>Latent common factor:</b> model cross-segment covariance explicitly.</li>
+          <li><b>Pareto-spliced enterprise tail:</b> test whether lognormal understates extreme account concentration.</li>
+          <li><b>Dynamic diffusion:</b> separate equilibrium adoption from the path to equilibrium.</li>
+          <li><b>Selection:</b> allow early adopters to have systematically different X distributions.</li>
+          <li><b>Price endogeneity:</b> separate token-volume TAM from dollar TAM when prices move.</li>
+        </ul>
+        <div class="takeaway" style="margin-top:1.3vh"><b>Diagnostic principle:</b> when a proposed extension breaks a finite third moment or invalidates N/E[N] → 1, the Gaussian convergence machinery should fail visibly rather than silently.</div>
+      </div>
+    </div>
+    <div class="footer"><span class="source">Theory §8 · Known limitations and Phase-5 extensions.</span><span class="slide-no">A2</span></div>
+  </section>
+
+  <section class="slide" data-title="Implementation map">
+    <div class="appendix-badge">C · Implementation & validation</div>
+    <h2>The theory is executable and independently checked</h2>
+    <p class="lede">Each analytical object has a direct code implementation and an independent numerical or simulation-based validation path.</p>
+    <div class="impl">
+      <div class="card">
+        <div class="label">Unit layer</div>
+        <h3><span class="mono">lognormal_moments</span></h3>
+        <p>Correlation-aware lognormal moments and optional truncation.</p>
+        <span class="check">✓ checked against quadrature / brute MC</span>
+      </div>
+      <div class="card">
+        <div class="label">Aggregation layer</div>
+        <h3><span class="mono">compound_moments</span></h3>
+        <p>Exact first three moments for random-count sums.</p>
+        <span class="check">✓ checked against large brute-force simulations</span>
+      </div>
+      <div class="card">
+        <div class="label">Market layer</div>
+        <h3><span class="mono">tam_expected</span> / <span class="mono">tam_variance</span></h3>
+        <p>Consumer + enterprise aggregation and structural scale factor θ.</p>
+        <span class="check">✓ checked in two-segment simulations</span>
+      </div>
+      <div class="card">
+        <div class="label">Diagnostic layer</div>
+        <h3><span class="mono">tam_skewness</span></h3>
+        <p>Exact Gaussian-convergence diagnostic from the first three moments.</p>
+        <span class="check">✓ compared with independent simulation frontiers</span>
+      </div>
+      <div class="card">
+        <div class="label">Approximation layer</div>
+        <h3><span class="mono">sigma_crit_*</span></h3>
+        <p>Closed forms for interpretable limiting regimes.</p>
+        <span class="check">✓ domain and self-consistency checks</span>
+      </div>
+      <div class="card green">
+        <div class="label">Production path</div>
+        <h3><span class="mono">sigma_crit_numeric</span></h3>
+        <p>Brent root-finding on exact skewness; honors caps, correlation, and count moments.</p>
+        <span class="check">✓ γ = ε to ~10⁻⁹ relative error</span>
+      </div>
+    </div>
+    <div class="takeaway" style="margin-top:1.6vh"><b>Contract:</b> the Monte Carlo layer is accepted only when its simulated mean, variance, and skewness reproduce the analytical moments within Monte Carlo error.</div>
+    <div class="footer"><span class="source">Theory §9 · Implementation map and Phase-2 validation contract.</span><span class="slide-no">A3</span></div>
+  </section>
+
+</div>
+<div class="navhint">← → / PgUp PgDn · Home End · P = print</div>
+<div class="progress" id="progress"></div>
+<script>
+(function(){
+  const slides=[...document.querySelectorAll('.slide')];
+  const progress=document.getElementById('progress');
+  let idx=0;
+  function show(i){
+    idx=Math.max(0,Math.min(slides.length-1,i));
+    slides.forEach((s,j)=>s.classList.toggle('active',j===idx));
+    progress.style.width=((idx+1)/slides.length*100)+'%';
+    document.title=(slides[idx].dataset.title||'Theory Deck')+' | AI Inference Token TAM';
+    history.replaceState(null,'','#'+(idx+1));
+  }
+  const hash=parseInt(location.hash.replace('#',''),10);
+  if(Number.isFinite(hash)&&hash>=1&&hash<=slides.length) idx=hash-1;
+  show(idx);
+  addEventListener('keydown',e=>{
+    if(['ArrowRight','PageDown',' ','Enter'].includes(e.key)){e.preventDefault();show(idx+1)}
+    else if(['ArrowLeft','PageUp','Backspace'].includes(e.key)){e.preventDefault();show(idx-1)}
+    else if(e.key==='Home'){e.preventDefault();show(0)}
+    else if(e.key==='End'){e.preventDefault();show(slides.length-1)}
+    else if(e.key.toLowerCase()==='p'){window.print()}
+  });
+  addEventListener('wheel',e=>{
+    if(Math.abs(e.deltaY)<25) return;
+    if(window._wheelLock) return;
+    window._wheelLock=true; setTimeout(()=>window._wheelLock=false,350);
+    show(idx+(e.deltaY>0?1:-1));
+  },{passive:true});
+  addEventListener('click',e=>{
+    if(e.target.closest('a,button')) return;
+    const x=e.clientX/window.innerWidth;
+    if(x>.82) show(idx+1); else if(x<.18) show(idx-1);
+  });
+})();
+</script>
+</body>
+</html>
